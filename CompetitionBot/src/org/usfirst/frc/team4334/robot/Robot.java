@@ -38,6 +38,7 @@ package org.usfirst.frc.team4334.robot;
 
 import java.util.Timer;
 import java.util.TimerTask;
+
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.CANTalon;
 import edu.wpi.first.wpilibj.Compressor;
@@ -47,6 +48,7 @@ import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj.Talon;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -61,7 +63,8 @@ public class Robot extends IterativeRobot {
     //This function is run when the robot is first started up and should be
     //used for any initialization code.
      	
-    
+    Preferences prefs;
+	
 	Joystick joy;
 	Joystick joy2;
 	
@@ -81,7 +84,7 @@ public class Robot extends IterativeRobot {
 	
 	Timer sensorThread;
 	Timer elevatorThread;
-	
+
 	AnalogInput pot1;
 	Compressor comp;
     DoubleSolenoid gearShift;
@@ -132,6 +135,8 @@ public class Robot extends IterativeRobot {
     public void robotInit()
     {
    
+    
+    	
     canFL = new CANTalon(1);
 	canBL = new CANTalon(2);
 	canFR = new CANTalon(5);
@@ -176,13 +181,16 @@ public class Robot extends IterativeRobot {
 	encoderL.reset();
 	encoderR.reset();
     encoderElevator.reset();
-    autoMode = 6;
     teleOpOnce = true;
     goOnce = true;
     threeToteMode = 0;
     }
 
     
+    public void autonomousInit()
+    {
+    	autoMode = prefs.getInt("Auto Mode", 0);
+    }
     
      //This function is called periodically [20 ms] during autonomous
     
@@ -195,7 +203,7 @@ public class Robot extends IterativeRobot {
     		if(autoMode == 0)
     		{
     			goOnce = false;
-    			Testing();
+    			nothingAuto();
     		}
     		
     		if(autoMode == 1)
@@ -221,7 +229,7 @@ public class Robot extends IterativeRobot {
     		if(autoMode == 4)
     		{
     			goOnce = false;
-    			nothingAuto();
+    			Testing();
     		}
     		
     		if(autoMode == 6)

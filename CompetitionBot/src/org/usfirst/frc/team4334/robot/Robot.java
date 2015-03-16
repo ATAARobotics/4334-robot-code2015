@@ -36,6 +36,8 @@
 
 package org.usfirst.frc.team4334.robot;
 
+import java.util.Timer;
+import java.util.TimerTask;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.CANTalon;
 import edu.wpi.first.wpilibj.Compressor;
@@ -77,6 +79,9 @@ public class Robot extends IterativeRobot {
 	Encoder encoderR;
 	Encoder encoderElevator;
 	
+	Timer sensorThread;
+	Timer elevatorThread;
+	
 	AnalogInput pot1;
 	Compressor comp;
     DoubleSolenoid gearShift;
@@ -94,7 +99,7 @@ public class Robot extends IterativeRobot {
     double degrees, potDegrees;
 	double leftThumb,rightThumb;
 	double q;
-	double turnRad;
+	double turnRad, speedMultiplier;
 	double deadZ, deadZ2;
 	
     boolean stillPressed;
@@ -115,7 +120,7 @@ public class Robot extends IterativeRobot {
 	boolean gotoCam2 = false;
 	boolean camChange = false;
 	boolean camActivate = false;
-	boolean goOnce;
+	boolean goOnce, teleOpOnce;
 	
 	int camMode;
 	int leftR, rightR, elevatorR;
@@ -136,6 +141,9 @@ public class Robot extends IterativeRobot {
     talKicker = new Talon(0);
     talArmLeft = new Talon(1);
     talArmRight = new Talon(2);
+    
+    sensorThread = new Timer();
+    elevatorThread = new Timer();
     
     elevatorManual = false;
     camMode = 1;
@@ -169,6 +177,7 @@ public class Robot extends IterativeRobot {
 	encoderR.reset();
     encoderElevator.reset();
     autoMode = 6;
+    teleOpOnce = true;
     goOnce = true;
     threeToteMode = 0;
     }
@@ -181,6 +190,8 @@ public class Robot extends IterativeRobot {
     {
     	if(goOnce)
     	{
+    		elevatorThread.schedule(new TimerTask(){public void run(){elevator();}}, 20, 20);
+    		
     		if(autoMode == 0)
     		{
     			goOnce = false;
@@ -231,15 +242,21 @@ public class Robot extends IterativeRobot {
     
 	public void teleopPeriodic() 
     {
-    	//cameraOn();
+		if(teleOpOnce)
+		{
+			elevatorThread.schedule(new TimerTask(){public void run(){elevator();}}, 20, 20);
+			sensorThread.schedule(new TimerTask(){public void run(){getSensors();}}, 20, 20);
+			
+			teleOpOnce = false;
+		}
     	
-		getSensors();
+		//getSensors();
 		
     	arcadeDrive();
     	
     	armMotors();
     	
-    	elevator();
+    	//elevator();
     		
     	buttonToggles();
     	
@@ -252,8 +269,6 @@ public class Robot extends IterativeRobot {
     	elevatorLow();
     	
     	smartDashboard();
-    	
-    	//cameraOff();
     	
     }
 
@@ -568,75 +583,77 @@ public class Robot extends IterativeRobot {
     	leftThumb = -(joy.getRawAxis(1));
     	
     	rightThumb = q;
+    	
+    	speedMultiplier = 1;
      	
     	deadZ = 0.25;
     	
-    	turnRad = 0.76;
+    	turnRad = 0.87;
     	
     	//If left thumbstick is still
     	
     	if((leftThumb < deadZ) && (leftThumb > -deadZ))
     	{
-    		canFL.set(-(rightThumb * turnRad));
-    		canBL.set(-(rightThumb * turnRad));
+    		canFL.set(((-(rightThumb * turnRad))) * speedMultiplier);
+    		canBL.set(((-(rightThumb * turnRad))) * speedMultiplier);
     		
-    		canBR.set(-(rightThumb * turnRad));
-    		canFR.set(-(rightThumb * turnRad));
+    		canBR.set(((-(rightThumb * turnRad))) * speedMultiplier);
+    		canFR.set(((-(rightThumb * turnRad))) * speedMultiplier);
     	}
     	
     	//If right thumbstick is still
     	
     	if((rightThumb < deadZ) && (rightThumb > -deadZ))
     	{
-    		canFL.set(-leftThumb);
-    		canBL.set(-leftThumb);
+    		canFL.set(((-leftThumb)) * speedMultiplier);
+    		canBL.set(((-leftThumb)) * speedMultiplier);
     		
-    		canBR.set(leftThumb);
-    		canFR.set(leftThumb);
+    		canBR.set(((leftThumb)) * speedMultiplier);
+    		canFR.set(((leftThumb)) * speedMultiplier);
     	}
     	
     	//If both thumbsticks are positive
     	
     	if((leftThumb > deadZ) && (rightThumb > deadZ))
     	{
-    		canFL.set(-leftThumb);
-    		canBL.set(-leftThumb);
+    		canFL.set(((-leftThumb)) * speedMultiplier);
+    		canBL.set(((-leftThumb)) * speedMultiplier);
     		
-    		canBR.set(leftThumb - (rightThumb * turnRad));
-    		canFR.set(leftThumb - (rightThumb * turnRad));
+    		canBR.set(((leftThumb - (rightThumb * turnRad))) * speedMultiplier);
+    		canFR.set(((leftThumb - (rightThumb * turnRad))) * speedMultiplier);
     	}
     	
     	//If left thumbstick is positive and right thumbstick is negative
     	
     	if((leftThumb > deadZ) && (rightThumb < -deadZ))
     	{
-    		canFL.set(-(leftThumb + (rightThumb * turnRad)));
-    		canBL.set(-(leftThumb + (rightThumb * turnRad)));
+    		canFL.set(((-(leftThumb + (rightThumb * turnRad)))) * speedMultiplier);
+    		canBL.set(((-(leftThumb + (rightThumb * turnRad)))) * speedMultiplier);
 		
-    		canBR.set(leftThumb);
-    		canFR.set(leftThumb);
+    		canBR.set(((leftThumb)) * speedMultiplier);
+    		canFR.set(((leftThumb)) * speedMultiplier);
     	}
     	
     	//If left thumbstick is negative and right thumbstick is positive
     	
     	if((leftThumb < -deadZ) && (rightThumb > deadZ))
     	{
-    		canFL.set(-(leftThumb + (rightThumb * turnRad)));
-    		canBL.set(-(leftThumb + (rightThumb * turnRad)));
+    		canFL.set(((-(leftThumb + (rightThumb * turnRad)))) * speedMultiplier);
+    		canBL.set(((-(leftThumb + (rightThumb * turnRad)))) * speedMultiplier);
     		
-    		canBR.set(leftThumb);
-    		canFR.set(leftThumb);
+    		canBR.set(((leftThumb)) * speedMultiplier);
+    		canFR.set(((leftThumb)) * speedMultiplier);
     	}
     	
     	//If left thumbstick is negative and right thumbstick is negative
     	
     	if((leftThumb < -deadZ) && (rightThumb < -deadZ))
     	{
-    		canFL.set(-leftThumb);
-    		canBL.set(-leftThumb);
+    		canFL.set(((-leftThumb)) * speedMultiplier);
+    		canBL.set(((-leftThumb)) * speedMultiplier);
     		
-    		canBR.set(leftThumb - (rightThumb * turnRad));
-    		canFR.set(leftThumb - (rightThumb * turnRad));
+    		canBR.set(((leftThumb - (rightThumb * turnRad))) * speedMultiplier);
+    		canFR.set(((leftThumb - (rightThumb * turnRad))) * speedMultiplier);
     	}
 
     }
@@ -908,13 +925,18 @@ public class Robot extends IterativeRobot {
 		
     }
 
-    public void moveArms(int loopCount, int power)
+    public void moveArms(int time, int power)
     {
-    	for(int i = 0; i < loopCount; i++)
-    	{
-    		talArmLeft.set(power);
-    		talArmRight.set(-power);
-    	}
+    	
+    	talArmLeft.set(power);
+    	talArmRight.set(-power);
+    		
+    	try {
+    			Thread.sleep(time);
+    	} catch (InterruptedException e) {
+    		
+   			Thread.currentThread().interrupt();
+   		}
     	
     	talArmLeft.set(0);
 		talArmRight.set(0);
@@ -952,7 +974,7 @@ public class Robot extends IterativeRobot {
     	
     	drive(1800, 0.5);
     	
-    	moveArms(5, 1);
+    	moveArms(1000, 1);
     	
     	armsOpen();
     }
@@ -965,7 +987,7 @@ public class Robot extends IterativeRobot {
     	
     	drive(1800, 0.6);
     	
-    	moveArms(5, 1);
+    	moveArms(1000, 1);
     	
     	armsOpen();
     }
@@ -1086,7 +1108,7 @@ public class Robot extends IterativeRobot {
 		canFR.set(0);
 		
 		try {
-			Thread.sleep(1200);
+			Thread.sleep(900);
 		} catch (InterruptedException e) {
 			
 			Thread.currentThread().interrupt();
@@ -1095,7 +1117,7 @@ public class Robot extends IterativeRobot {
     	stingerOut();
     	
     	try {
-			Thread.sleep(1500);
+			Thread.sleep(1000);
 		} catch (InterruptedException e) {
 			
 			Thread.currentThread().interrupt();

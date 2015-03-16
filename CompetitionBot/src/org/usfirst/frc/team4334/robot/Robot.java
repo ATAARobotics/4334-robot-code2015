@@ -82,8 +82,14 @@ public class Robot extends IterativeRobot {
 	Encoder encoderR;
 	Encoder encoderElevator;
 	
+	Timer sensorThreadAuto;
+	Timer elevatorThreadAuto;
+	Timer elevatorThread2Auto;	
 	Timer sensorThread;
 	Timer elevatorThread;
+	Timer elevatorThread2;
+	Timer camThreadAuto;
+	Timer camThread;
 
 	AnalogInput pot1;
 	Compressor comp;
@@ -101,7 +107,6 @@ public class Robot extends IterativeRobot {
     double leftTrig2,rightTrig2;
     double degrees, potDegrees;
 	double leftThumb,rightThumb;
-	double q;
 	double turnRad, speedMultiplier;
 	double deadZ, deadZ2;
 	
@@ -134,9 +139,7 @@ public class Robot extends IterativeRobot {
 	
     public void robotInit()
     {
-   
-    
-    	
+   	
     canFL = new CANTalon(1);
 	canBL = new CANTalon(2);
 	canFR = new CANTalon(5);
@@ -149,6 +152,12 @@ public class Robot extends IterativeRobot {
     
     sensorThread = new Timer();
     elevatorThread = new Timer();
+    elevatorThread2 = new Timer();
+    sensorThreadAuto = new Timer();
+    elevatorThreadAuto = new Timer();
+    elevatorThread2Auto = new Timer();
+    camThreadAuto = new Timer();
+    camThread = new Timer();
     
     elevatorManual = false;
     camMode = 1;
@@ -180,7 +189,7 @@ public class Robot extends IterativeRobot {
 	encoderL = new Encoder(6, 7, true, EncodingType.k4X);
 	encoderL.reset();
 	encoderR.reset();
-    encoderElevator.reset();
+    encoderElevator.reset(); 
     teleOpOnce = true;
     goOnce = true;
     threeToteMode = 0;
@@ -198,7 +207,9 @@ public class Robot extends IterativeRobot {
     {
     	if(goOnce)
     	{
-    		elevatorThread.schedule(new TimerTask(){public void run(){elevator();}}, 20, 20);
+    		autoMode = prefs.getInt("Auto Mode", 0);
+    		elevatorThread2Auto.schedule(new TimerTask(){public void run(){elevatorLow();}}, 20, 20);
+    		elevatorThreadAuto.schedule(new TimerTask(){public void run(){elevatorOneTote();}}, 20, 20);
     		
     		if(autoMode == 0)
     		{
@@ -240,7 +251,8 @@ public class Robot extends IterativeRobot {
     		
     		if(autoMode == 7)
     		{
-    			
+    			goOnce = false;
+    			threeToteAuto();
     		}
     	}
     }
@@ -252,7 +264,8 @@ public class Robot extends IterativeRobot {
     {
 		if(teleOpOnce)
 		{
-			elevatorThread.schedule(new TimerTask(){public void run(){elevator();}}, 20, 20);
+			elevatorThread.schedule(new TimerTask(){public void run(){elevatorOneTote();}}, 20, 20);
+			elevatorThread2.schedule(new TimerTask(){public void run(){elevatorLow();}}, 20, 20);
 			sensorThread.schedule(new TimerTask(){public void run(){getSensors();}}, 20, 20);
 			
 			teleOpOnce = false;
@@ -264,7 +277,7 @@ public class Robot extends IterativeRobot {
     	
     	armMotors();
     	
-    	//elevator();
+    	elevator();
     		
     	buttonToggles();
     	
@@ -272,9 +285,9 @@ public class Robot extends IterativeRobot {
     	
     	camSetpoint();
     	
-    	elevatorOneTote();
+    	//elevatorOneTote();
     	
-    	elevatorLow();
+    	//elevatorLow();
     	
     	smartDashboard();
     	
@@ -287,7 +300,7 @@ public class Robot extends IterativeRobot {
     	
     }
 
-//---------------------------------------------------------------------------------------------------------------------------------\\
+//----------------------------------------------------------------------------------------------------------------------------------\\
    
     //Teleop methods
     
@@ -586,17 +599,15 @@ public class Robot extends IterativeRobot {
     
     public void arcadeDrive()
     {
-    	q = (joy.getRawAxis(4));
+    	rightThumb = joy.getRawAxis(4);
     	
     	leftThumb = -(joy.getRawAxis(1));
-    	
-    	rightThumb = q;
     	
     	speedMultiplier = 1;
      	
     	deadZ = 0.25;
     	
-    	turnRad = 0.87;
+    	turnRad = 0.74;
     	
     	//If left thumbstick is still
     	
@@ -772,7 +783,7 @@ public class Robot extends IterativeRobot {
 
 //----------------------------------------------------------------------------------------------------------------------------------\\
    
-    //Auto Mode methods  
+    //Auto Mode methods
     
     public void getSensors()
     {
@@ -804,6 +815,9 @@ public class Robot extends IterativeRobot {
     	
     	canFL.set(0);
 		canBL.set(0);
+		
+		canBR.set(0);
+		canFR.set(0);
 	
     }
     
@@ -960,6 +974,16 @@ public class Robot extends IterativeRobot {
     	flipper.set(DoubleSolenoid.Value.kReverse);
     }
     
+    public void wait(int Milliseconds)
+    {
+    	try {
+			Thread.sleep(Milliseconds);
+		} catch (InterruptedException e) {
+			
+			Thread.currentThread().interrupt();
+		}
+    }
+    
 //----------------------------------------------------------------------------------------------------------------------------------\\
     
     //Auto Modes
@@ -972,6 +996,10 @@ public class Robot extends IterativeRobot {
     public void moveToZoneAuto()
     {
     	drive(400, -0.5);
+    	
+    	elevatorThreadAuto.cancel();
+    	elevatorThread2Auto.cancel();
+    	sensorThreadAuto.cancel();
     }
     
     public void oneToteAuto()
@@ -985,6 +1013,10 @@ public class Robot extends IterativeRobot {
     	moveArms(1000, 1);
     	
     	armsOpen();
+    	
+    	elevatorThreadAuto.cancel();
+    	elevatorThread2Auto.cancel();
+    	sensorThreadAuto.cancel();
     }
     
     public void oneBinAuto()
@@ -998,166 +1030,95 @@ public class Robot extends IterativeRobot {
     	moveArms(1000, 1);
     	
     	armsOpen();
+    	
+    	elevatorThreadAuto.cancel();
+    	elevatorThread2Auto.cancel();
+    	sensorThreadAuto.cancel();
     }
     
     public void nothingAuto()
     {
-    	
+    	elevatorThreadAuto.cancel();
+    	elevatorThread2Auto.cancel();
+    	sensorThreadAuto.cancel();
     }
     
     public void threeToteAuto()
     {
-    	if(threeToteMode == 0)
-    	{
-    		gotoSpot = true;
-    		gotoCam1 = true;
-			gotoCam2 = false;
-    		camActivate = true;
-    		threeToteMode = 1;
-    	}
     	
-    	if(threeToteMode == 1)
-    	{
-    		rightTurn45(0.7);
-    		threeToteMode = 2;
-    	}
+    	gotoSpot = true;
+		gotoCam1 = true;
+		gotoCam2 = false;
+		camActivate = true;
     	
-    	if(threeToteMode == 2)
-    	{
-    		drive(400, 0.5);
-    		threeToteMode = 3;
-    	}
+    	rightTurn45(0.7);
+		
+		drive(300, 0.5);
+		
+		leftTurn90(0.5);
+		
+    	drive(300, 0.5);
     	
-    	if(threeToteMode == 3)
-    	{
-    		leftTurn90(0.7);
-    		threeToteMode = 4;
-    	}
+    	armsClose();
     	
-    	if(threeToteMode == 4)
-    	{
-    		drive(550, 0.5);
-    		threeToteMode = 5;
-    	}
+    	gotoSpot2 = true;
+		gotoCam1 = false;
+		gotoCam2 = true;
+		camActivate = true;
     	
-    	if(threeToteMode == 5)
-    	{
-    		armsClose();	
-    		moveArms(5, 1);
-    		threeToteMode = 6;
-    	}
+    	moveArms(650, 1);
     	
-    	if(threeToteMode == 6)
-    	{
-    		gotoSpot = true;
-    		gotoCam1 = true;
-			gotoCam2 = false;
-    		camActivate = true;
-    		rightTurn90(0.7);
-    		threeToteMode = 7;
-    	}
+    	rightTurn90(0.5);
     	
-    	if(threeToteMode == 7)
-    	{
-    		drive(400, 0.5);
-    		threeToteMode = 8;
-    	}
+    	drive(300, 0.5);
     	
-    	if(threeToteMode == 8)
-    	{
-    		leftTurn90(0.7);
-    		threeToteMode = 9;
-    	}
+    	leftTurn90(0.5);
     	
-    	if(threeToteMode == 9)
-    	{
-    		drive(550, 0.5);
-    		threeToteMode = 10;
-    	}
+    	gotoSpot = true;
+		gotoCam1 = true;
+		gotoCam2 = false;
+		camActivate = true;
     	
-    	if(threeToteMode == 10)
-    	{
-    		armsClose();
-    		moveArms(5, 1);
-    		threeToteMode = 11;
-    	}
+    	drive(300, 0.5);
     	
-    	if(threeToteMode == 11)
-    	{
-    		gotoSpot = true;
-    		gotoCam1 = true;
-			gotoCam2 = false;
-    		camActivate = true;
-    		rightTurn90(0.7);
-    		threeToteMode = 12;
-    	}
-    			
+    	armsClose();
+    	
+    	leftTurn90(0.5);
+    	
+    	drive(4500, 0.7);
+    	
+    	moveArms(650, 1);
+    	
+    	gotoSpot2 = true;
+		gotoCam1 = false;
+		gotoCam2 = true;
+		camActivate = true;
+		
+		wait(3000);
+		
+		drive(500, -0.5);
+		
     }
- 
+  
     public void binJackerAuto()
     {
-    	canFL.set(0.7);
-		canBL.set(0.7);
+    	drive(598, -0.7);
 		
-		canBR.set(-0.7);
-		canFR.set(-0.7);
-    	
-		try {
-			Thread.sleep(598);
-		} catch (InterruptedException e) {
-			
-			Thread.currentThread().interrupt();
-		}
-		
-		canFL.set(0);
-		canBL.set(0);
-		
-		canBR.set(0);
-		canFR.set(0);
-		
-		try {
-			Thread.sleep(900);
-		} catch (InterruptedException e) {
-			
-			Thread.currentThread().interrupt();
-		}
+		wait(900);
 		
     	stingerOut();
     	
-    	try {
-			Thread.sleep(1000);
-		} catch (InterruptedException e) {
-			
-			Thread.currentThread().interrupt();
-		}
+    	wait(1000);
     	
-    	canFL.set(-1);
-		canBL.set(-1);
-		
-		canBR.set(1);
-		canFR.set(1);
-		
-		try {
-			Thread.sleep(800);
-		} catch (InterruptedException e) {
-			
-			Thread.currentThread().interrupt();
-		}
-		
-		canFL.set(0);
-		canBL.set(0);
-		
-		canBR.set(0);
-		canFR.set(0);
+    	drive(800, 1);
     	
-		try {
-			Thread.sleep(700);
-		} catch (InterruptedException e) {
-			
-			Thread.currentThread().interrupt();
-		}
+		wait(700);
 		
     	stingerIn();
+    	
+    	elevatorThreadAuto.cancel();
+    	elevatorThread2Auto.cancel();
+    	sensorThreadAuto.cancel();
     }
     
 }

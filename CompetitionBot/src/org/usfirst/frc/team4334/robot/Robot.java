@@ -14,6 +14,7 @@
  * 
  * 		A = Stinger	
  * 		B = Switch Gears
+ * 		X = Arcade Toggle
  * 	
  *		Joystick 2:
  *
@@ -119,7 +120,8 @@ public class Robot extends IterativeRobot {
     boolean stillPressed6;
     boolean stillPressed7;
     boolean stillPressed8;
-    boolean stillPressed9;	//End
+    boolean stillPressed9;
+    boolean stillPressed10; //End
     boolean elevatorMax;	//Booleans for elevator limit switches
     boolean elevatorMin;
     boolean elevatorManual;	//Boolean to decide whether manual elevator control is allowed
@@ -559,6 +561,24 @@ public class Robot extends IterativeRobot {
     				stillPressed3=true;
     			}
     		}	
+    		
+    	//Arcade Mode Toggle
+        	
+        	if (joy.getRawButton(3) == false) {stillPressed10 = false;}
+        	
+        	if (joy.getRawButton(3) && (!stillPressed10))
+        	{
+        		if ((speedMultiplier == 1))
+       			{
+       				speedMultiplier = 0.4;
+       				stillPressed10=true;
+       			}
+        		else 
+        		{
+        			speedMultiplier = 1;
+        			stillPressed10=true;
+        		}
+        	}
     }
        
     public void camSetpoint()
@@ -602,7 +622,7 @@ public class Robot extends IterativeRobot {
     
     public void arcadeDrive()
     {
-    	//Assign the xbox values to variables
+    	//Assign the Xbox values to variables
     	
     	rightThumb = joy.getRawAxis(4);
     	
@@ -1163,3 +1183,6 @@ public class Robot extends IterativeRobot {
     }
     
 }
+
+//----------------------------------------------------------------------------------------------------------------------------------\\
+//End.

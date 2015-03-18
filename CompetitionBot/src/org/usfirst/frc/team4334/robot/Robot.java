@@ -189,7 +189,7 @@ public class Robot extends IterativeRobot {
     	encoderR.reset();
     	encoderElevator.reset(); 
     	teleOpOnce = true;
-    	autoMode = 1;
+    	autoMode = 2;
     	goOnce = true;
     }
 
@@ -210,6 +210,7 @@ public class Robot extends IterativeRobot {
     		//autoMode = prefs.getInt("Auto Mode", 0);
     		elevatorThread2Auto.schedule(new TimerTask(){public void run(){elevatorLow();}}, 20, 20); //Starting Threads for auto
     		elevatorThreadAuto.schedule(new TimerTask(){public void run(){elevatorOneTote();}}, 20, 20);
+    		sensorThread.schedule(new TimerTask(){public void run(){getSensors();}}, 20, 20);
     		
     		if(autoMode == 0)
     		{
@@ -850,140 +851,157 @@ public class Robot extends IterativeRobot {
     {
     	//Sets the arms solenoids to open
     	
-    	leftArm.set(DoubleSolenoid.Value.kForward);  
-		rightArm.set(DoubleSolenoid.Value.kForward);
+    	leftArm.set(DoubleSolenoid.Value.kReverse);  
+		rightArm.set(DoubleSolenoid.Value.kReverse);
+    	
     }
     
     public void armsOpen()
     {
     	//Sets the arms solenoids to closed
+    	leftArm.set(DoubleSolenoid.Value.kForward);  
+		rightArm.set(DoubleSolenoid.Value.kForward);
     	
-    	leftArm.set(DoubleSolenoid.Value.kReverse);  
-		rightArm.set(DoubleSolenoid.Value.kReverse);
     }
     
     public void leftTurn90(double power)
     {
     	//Sets the drivetrain motors to the given power to make a right angle turn
     	
-    	while(rightR < 730)
+    	while(rightR < 550)
     	{
-    		getSensors();
-    		
     		canFL.set(power);
     		canBL.set(power);
     		
     		canBR.set(power);
     		canFR.set(power);
     	}
-    	
-    	//Stops
-    	
     	canFL.set(0);
 		canBL.set(0);
 		
 		canBR.set(0);
 		canFR.set(0);
-    	
-		//Resets the encoders
 		
-    	encoderR.reset();
-    	encoderL.reset();
+		encoderL.reset();
+    
     }
     
     public void rightTurn90(double power)
     {
     	//Sets the drivetrain motors to the given power to make a right angle turn
     	
-    	while(rightR < 730)
+    	while(rightR < 550)
     	{
-    		getSensors();
-    		
     		canFL.set(-power);
     		canBL.set(-power);
     		
     		canBR.set(-power);
     		canFR.set(-power);
     	}
-    	
-    	//Stops
-    	
     	canFL.set(0);
 		canBL.set(0);
 		
 		canBR.set(0);
 		canFR.set(0);
-    	
-		//Resets the encoders
 		
-    	encoderR.reset();
-    	encoderL.reset();
+		encoderL.reset();
     }
     
     public void leftTurn45(double power)
     {
     	//Sets the drivetrain motors to the given power to make a 45 degree turn
     	
-    	while(rightR < 365)
-    	{
-    		getSensors();
-    		
-    		canFL.set(power);
-    		canBL.set(power);
-    		
-    		canBR.set(power);
-    		canFR.set(power);
-    	}
-    	
-    	//Stops
+    	canFL.set(power);
+		canBL.set(power);
+		
+		canBR.set(power);
+		canFR.set(power);
+		
+		//Waits for the given time
+		
+		try {
+			Thread.sleep(353);
+		} catch (InterruptedException e) {
+			
+			Thread.currentThread().interrupt();
+		}
+		
+		//Stops
     	
     	canFL.set(0);
 		canBL.set(0);
 		
 		canBR.set(0);
 		canFR.set(0);
-    	
-		//Stops
-		
-    	encoderR.reset();
-    	encoderL.reset();
     }
     
     public void rightTurn45(double power)
     {
     	//Sets the drivetrain motors to the given power to make a 45 degree turn
     	
-    	while(rightR < 365)
-    	{
-    		getSensors();
-    		
-    		canFL.set(-power);
-    		canBL.set(-power);
-    		
-    		canBR.set(-power);
-    		canFR.set(-power);
-    	}
-    	
-    	//Stops
+    	canFL.set(-power);
+		canBL.set(-power);
+		
+		canBR.set(-power);
+		canFR.set(-power);
+		
+		//Waits for the given time
+		
+		try {
+			Thread.sleep(353);
+		} catch (InterruptedException e) {
+			
+			Thread.currentThread().interrupt();
+		}
+		
+		//Stops
     	
     	canFL.set(0);
 		canBL.set(0);
 		
 		canBR.set(0);
 		canFR.set(0);
-    	
-		//Resets the encoders
-		
-    	encoderR.reset();
-    	encoderL.reset();
     }
     
+    public void setTurn(double turnDegrees, double power){
+  //Sets the drivetrain motors to the given power to make a right angle turn
+	
+    if( turnDegrees > 0 )
+    {
+    	canFL.set(power);
+    	canBL.set(power);
+    	
+    	canBR.set(power);
+    	canFR.set(power);
+    	
+    	//Waits for the given time
+    /*	
+    	try {
+    		Thread.sleep(turnDegrees);
+    	} catch (InterruptedException e) {
+    		
+    		Thread.currentThread().interrupt();
+    	}
+    	
+    	*/
+    	//Stops
+    	
+    	canFL.set(0);
+    	canBL.set(0);
+    	
+    	canBR.set(0);
+    	canFR.set(0);
+    
+    	
+    }
+    }
+
     public void moveArms(int time, int power)
     {
     	//Moves arms ar given power
     	
-    	talArmLeft.set(power);
-    	talArmRight.set(-power);
+    	talArmLeft.set(-power);
+    	talArmRight.set(power);
     		
     	//Waits for the given time
     	
@@ -1032,7 +1050,7 @@ public class Robot extends IterativeRobot {
     
     public void Testing()
     {
-    	
+    	leftTurn90(0.7);
     }
     
     public void moveToZoneAuto()
@@ -1048,11 +1066,9 @@ public class Robot extends IterativeRobot {
     {
     	armsClose();
     	
-    	rightTurn90(0.7);
+    	rightTurn90(1);
     	
-    	drive(1800, 0.5);
-    	
-    	moveArms(1000, 1);
+    	drive(1400, 0.5);
     	
     	armsOpen();
     	

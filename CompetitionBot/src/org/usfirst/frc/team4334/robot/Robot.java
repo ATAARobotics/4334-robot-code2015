@@ -116,6 +116,14 @@ public class Robot extends IterativeRobot
 	double deadZ, deadZ2;			// Variables that store deadzones
 	double camSet1, camSet2;		// Variables that decide that setpoints the cam uses
 	
+	//emulator defines
+	double buttonJ1Ljoy; 
+	double buttonJ1Rjoy;
+	double buttonJ2Ljoy;
+	double buttonJ2Rjoy;
+	double buttonJ2Ltrig;
+	double buttonJ2Rtrig;
+	
     boolean stillPressed;	//Booleans to stop button presses from repeating 20 x per second lol
     boolean stillPressed2;
     boolean stillPressed3;
@@ -136,6 +144,30 @@ public class Robot extends IterativeRobot
 	boolean camChange = false;
 	boolean camActivate = false;
 	boolean goOnce, teleOpOnce; // Variables to allow auto and certain teleop funtions to run only once
+	
+	//defineing buttons for emulator
+	boolean buttonJ1B1;
+	boolean buttonJ1B2;
+	boolean buttonJ1B3;
+	boolean buttonJ1B4;
+	boolean buttonJ1B5;
+	boolean buttonJ1B6;
+	boolean buttonJ1B7;
+	boolean buttonJ1B8;
+	boolean buttonJ1B9;
+	boolean buttonJ1B10;
+	
+	boolean buttonJ2B1;
+	boolean buttonJ2B2;
+	boolean buttonJ2B3;
+	boolean buttonJ2B4;
+	boolean buttonJ2B5;
+	boolean buttonJ2B6;
+	boolean buttonJ2B7;
+	boolean buttonJ2B8;
+	boolean buttonJ2B9;
+	boolean buttonJ2B10;
+	
 	
 	int camMode;	// Decide whether cam should use setpoint or manual mode
 	int leftR, rightR, elevatorR;	// Variables that store encoder values. "R" means rotations not "right".
@@ -228,6 +260,9 @@ public class Robot extends IterativeRobot
         List<Boolean> J2B10 = new ArrayList<Boolean>();
         List<Double> J2Ljoy = new ArrayList<Double>();
         List<Double> J2Rjoy = new ArrayList<Double>();
+        List<Double> J2Ltrig = new ArrayList<Double>(); //down
+        List<Double> J2Rtrig = new ArrayList<Double>(); //up
+        
         int loops = 0;
     
     	//autoMode = prefs.getInt("Auto Mode", 0); // Determining which auto mode should be used from the preferences table on SmartDashboard
@@ -1232,6 +1267,9 @@ public class Robot extends IterativeRobot
         J2B10.add(joy.getRawButton(10));
         J2Rjoy.add(joy2.getRawAxis(4));
         J2Ljoy.add(joy2.getRawAxis(1));
+        J2Ltrig.add(joy2.getRawAxis(2));
+        J2Rtrig.add(joy2.getRawAxis(3));
+        
         
         loops++;
         if(loops > 4){
@@ -1249,7 +1287,7 @@ public class Robot extends IterativeRobot
         	System.out.println("joy1 button9: "+J1B9);
         	System.out.println("joy1 button10: "+J1B10);
         	System.out.println("joy1 left stick: "+J1Ljoy);
-        	System.out.println("joy1 left stick: "+J1Rjoy);
+        	System.out.println("joy1 right stick: "+J1Rjoy);
         	System.out.println();
         	
         	//printing controller 2 lists
@@ -1264,7 +1302,10 @@ public class Robot extends IterativeRobot
         	System.out.println("joy2 button9: "+J2B9);
         	System.out.println("joy2 button10: "+J2B10);
         	System.out.println("joy2 left stick: "+J2Ljoy);
-        	System.out.println("joy2 left stick: "+J2Rjoy);
+        	System.out.println("joy2 right stick: "+J2Rjoy);
+        	System.out.println("joy2 left trigger: "+J2Ltrig);
+        	System.out.println("joy2 right trigger: "+J2Rtrig);
+        	System.out.println();
         	
         	//clearing lists
         	J1B1.clear();
@@ -1292,7 +1333,522 @@ public class Robot extends IterativeRobot
         	J2B10.clear();
         	J2Ljoy.clear();
         	J2Rjoy.clear();
+        	J2Ltrig.clear();
+        	J2Rtrig.clear();
         }
     }
     
+    public void playback(){
+    	//J1B1.add(joy.getRawButton(1));
+    	for (int i = 0; i < J1B1.size(); i++){
+    		boolean buttonJ1B1 = J1B1.get(i);
+    		boolean buttonJ1B2 = J1B2.get(i);
+    		boolean buttonJ1B3 = J1B3.get(i);
+    		boolean buttonJ1B4 = J1B4.get(i);
+    		boolean buttonJ1B5 = J1B5.get(i);
+    		boolean buttonJ1B6 = J1B6.get(i);
+    		boolean buttonJ1B7 = J1B7.get(i);
+    		boolean buttonJ1B8 = J1B8.get(i);
+    		boolean buttonJ1B9 = J1B9.get(i);
+    		boolean buttonJ1B10 = J1B10.get(i);
+    		double buttonJ1Ljoy = J1Ljoy.get(i);
+    		double buttonJ1Rjoy = J1Rjoy.get(i);
+    		
+    		boolean buttonJ2B1 = J2B1.get(i);
+    		boolean buttonJ2B2 = J2B2.get(i);
+    		boolean buttonJ2B3 = J2B3.get(i);
+    		boolean buttonJ2B4 = J2B4.get(i);
+    		boolean buttonJ2B5 = J2B5.get(i);
+    		boolean buttonJ2B6 = J2B6.get(i);
+    		boolean buttonJ2B7 = J2B7.get(i);
+    		boolean buttonJ2B8 = J2B8.get(i);
+    		boolean buttonJ2B9 = J2B9.get(i);
+    		boolean buttonJ2B10 = J2B10.get(i);
+    		double buttonJ2Ljoy = J2Ljoy.get(i);
+    		double buttonJ2Rjoy = J2Rjoy.get(i);
+    		double buttonJ2Ltrig = J2Ltrig.get(i);
+    		double buttonJ2Rtrig = J2Ltrig.get(i);
+    		
+    		
+    	}
+    	
+    }
+    
+//emulator methods DO NOT TOUCH----------------------------------------------------------------------------------------------------------
+    
+    public void elevatorLowE()
+    {
+    	if (buttonJ2B3 == false) {stillPressed7 = false;}
+    	
+    	if (buttonJ2B3 && (stillPressed7 == false))
+    	{
+    		gotoSpot2 = true;
+    		gotoCam1 = false;
+			gotoCam2 = true;
+    		camActivate = true;
+    		stillPressed7 = true;
+    	}
+    	
+    	if (gotoSpot2)
+    	{
+
+    		leftArm.set(DoubleSolenoid.Value.kForward);
+			rightArm.set(DoubleSolenoid.Value.kForward);
+    		
+    		if ((elevatorMin) && (elevatorR >= 1100))
+    		{
+    			canWinch.set(0.4);
+    			canWinch2.set(0.4);
+    		}
+    		
+    		else if((elevatorMin) && (elevatorR < 1100))
+    		{
+    			canWinch.set(0.2);
+    			canWinch2.set(0.2);
+    		}
+    		
+    		else 
+    		{
+    			canWinch.set(0);
+    			canWinch2.set(0);
+    			gotoSpot2=false;
+   			}
+    	}
+    }
+    
+    public void elevatorHighE()
+    {
+    	if (buttonJ2B2 == false) {stillPressed9 = false;}
+    	
+    	if (buttonJ2B2 && (stillPressed9 == false))
+    	{
+    		gotoSpot3 = true;
+    		gotoCam1 = true;
+			gotoCam2 = false;
+    		camActivate = true;	
+    		stillPressed9 = true;
+    	}
+    	
+    	if (gotoSpot3)
+    	{
+
+    		leftArm.set(DoubleSolenoid.Value.kForward);
+			rightArm.set(DoubleSolenoid.Value.kForward);
+    		
+    		if ((elevatorMax) && (elevatorR <= 7900))
+    		{
+    			canWinch.set(-0.8);
+    			canWinch2.set(0.8);
+    		}
+    		else if((elevatorMax) && (elevatorR > 7900))
+    		{
+    			canWinch.set(-0.33);
+    			canWinch2.set(0.33);
+    		}
+    		else {
+    			gotoSpot2=false;
+    		}
+    	}
+    }
+    
+    public void elevatorOneToteE()
+    {
+    	if (buttonJ2B4 == false) {stillPressed6 = false;}
+    	
+    	if (buttonJ2B4 && (stillPressed6 == false))
+    	{
+    		gotoSpot = true;
+    		gotoCam1 = true;
+			gotoCam2 = false;
+    		camActivate = true;
+    		stillPressed6 = true;
+    		
+    	}
+    	
+    	if (gotoSpot)
+    	{
+    
+    		leftArm.set(DoubleSolenoid.Value.kForward);
+			rightArm.set(DoubleSolenoid.Value.kForward);
+    		
+    		if (elevatorR < 10768)
+    		{
+    			canWinch.set(-1);
+    			canWinch2.set(-1);
+    		}
+    		else 
+    		{
+    			canWinch.set(0);
+    			canWinch2.set(0);
+    			gotoSpot=false;
+    		}
+    	}
+    }
+    
+    public void camFullManualE()
+    {
+    	//If cam manual is allowed, use the select button to move it in only one direction
+    	
+    	if(camMode == 2)
+    	{
+    		if(buttonJ1B8 == false)
+    		{
+    			talKicker.set(0);
+    		}
+    	
+    		if(buttonJ1B8 == true)
+    		{
+    			talKicker.set(-1);
+    		}
+
+    	}
+    }
+    
+    public void buttonTogglesE()
+    
+    {
+    	//Arcade mode speed switcher
+    	
+    	if (buttonJ1B3 == false) {stillPressed10 = false;}
+    	
+    	if (buttonJ1B3 && (stillPressed10 == false))
+    	{
+    		if (speedMultiplier == 1)
+			{
+				speedMultiplier = 0.4;
+				turnRad = 1.8;
+				stillPressed10 = true;
+				
+			}
+    		else if (speedMultiplier == 0.4)
+    		{
+    			speedMultiplier = 1;
+    			turnRad = 0.74;
+    			stillPressed10 = true;
+    		}
+    		
+    	}
+    	
+    	//Smartdashboard gear position string changer
+    	
+    	if(gearShift.get() == DoubleSolenoid.Value.kForward)
+    	{
+    		gearPos2 = "High Gear";
+    	}
+    	if(gearShift.get() == DoubleSolenoid.Value.kReverse)
+    	{
+    		gearPos2 = "Low Gear";
+    	}
+    	
+    	//Cam Setpoint Toggle
+    	
+    	if (buttonJ2B1 == false) {stillPressed5 = false;}
+    	
+    	if (buttonJ2B1 && (stillPressed5 == false))
+    	{
+    		if (gotoCam1)
+			{
+				gotoCam1 = false;
+				
+			}
+    		else if (!gotoCam1)
+    		{
+    			gotoCam1 = true;
+    		}
+    		
+    		camActivate = true;
+    		stillPressed5 = true;
+    	}
+    
+    	//Cam Mode Switching [RB]
+    	
+    	if (buttonJ2B6 == false) {stillPressed8 = false;}
+    	
+    	if (buttonJ2B6 && (stillPressed8 == false))
+    	{
+    		if (camMode == 1)
+    			{
+    				camMode = 2;
+    			}
+    		else if(camMode == 2)
+    		{
+    			camMode = 1;
+    		}
+    	}
+    	
+    	//Gear Shifting [Right Thumbstick Button]
+    	
+    	if (buttonJ1B2 == false) {stillPressed = false;}
+    	
+    	if (buttonJ1B2 && (stillPressed == false))
+    	{	
+    		if (gearShift.get() == DoubleSolenoid.Value.kForward)
+    			{
+    			gearShift.set(DoubleSolenoid.Value.kReverse);  		
+    			stillPressed=true;
+    			}
+    		else
+    		{
+    			gearShift.set(DoubleSolenoid.Value.kForward);
+    			stillPressed=true;
+    		}
+    	}
+    	
+    	//Arms Toggle [LB] Controller 1
+    	
+    	if (buttonJ1B5 == false) {stillPressed2 = false;}
+    	
+    	if (buttonJ1B5 && (stillPressed2 == false))
+    	{
+    		if ((leftArm.get() == DoubleSolenoid.Value.kForward) && (rightArm.get() == DoubleSolenoid.Value.kForward))
+   			{
+   				leftArm.set(DoubleSolenoid.Value.kReverse);  
+   				rightArm.set(DoubleSolenoid.Value.kReverse);
+   				stillPressed2=true;
+   			}
+    		else 
+    		{
+    			leftArm.set(DoubleSolenoid.Value.kForward);
+    			rightArm.set(DoubleSolenoid.Value.kForward);
+    			stillPressed2=true;
+    		}
+    	}
+    	
+    	//Arm Toggle [LB] Controller 2
+    	if (buttonJ2B5 == false) {stillPressed4 = false;}
+		
+    	if (buttonJ2B5 && (stillPressed4 == false))
+    	{
+    		if ((leftArm.get() == DoubleSolenoid.Value.kForward) && (rightArm.get() == DoubleSolenoid.Value.kForward))
+   			{
+   				leftArm.set(DoubleSolenoid.Value.kReverse);  
+   				rightArm.set(DoubleSolenoid.Value.kReverse);
+   				stillPressed4=true;
+   			}
+    		else 
+    		{
+    			leftArm.set(DoubleSolenoid.Value.kForward);
+    			rightArm.set(DoubleSolenoid.Value.kForward);
+    			stillPressed4=true;
+    		}
+    	}
+    	
+    	//Stinger [RB]
+    	
+    		if (buttonJ1B1 == false) {stillPressed3 = false;}
+    		
+    		if (buttonJ1B1 && (stillPressed3 == false))
+    		{
+    			if (flipper.get() == DoubleSolenoid.Value.kForward)
+    			{
+    				flipper.set(DoubleSolenoid.Value.kReverse);  		
+    				stillPressed3=true;
+    			}
+    			else
+    			{
+    				flipper.set(DoubleSolenoid.Value.kForward);
+    				stillPressed3=true;
+    			}
+    		}	
+    }
+              
+    public void arcadeDriveE()
+    {
+    	//Assign the xbox values to variables
+    	
+    	rightThumb = buttonJ1Rjoy;
+    	
+    	leftThumb = -buttonJ1Ljoy;
+    	
+    	//Define the speed multiplier, deadzones and turning radius multiplier
+     	
+    	deadZ = 0.25;
+    	
+    	//If left thumbstick is still
+    	
+    	if((leftThumb < deadZ) && (leftThumb > -deadZ))
+    	{
+    		canFL.set(((-(rightThumb * turnRad))) * speedMultiplier);
+    		canBL.set(((-(rightThumb * turnRad))) * speedMultiplier);
+    		
+    		canBR.set(((-(rightThumb * turnRad))) * speedMultiplier);
+    		canFR.set(((-(rightThumb * turnRad))) * speedMultiplier);
+    	}
+    	
+    	//If right thumbstick is still
+    	
+    	if((rightThumb < deadZ) && (rightThumb > -deadZ))
+    	{
+    		canFL.set(((-leftThumb)) * speedMultiplier);
+    		canBL.set(((-leftThumb)) * speedMultiplier);
+    		
+    		canBR.set(((leftThumb)) * speedMultiplier);
+    		canFR.set(((leftThumb)) * speedMultiplier);
+    	}
+    	
+    	//If both thumbsticks are positive
+    	
+    	if((leftThumb > deadZ) && (rightThumb > deadZ))
+    	{
+    		canFL.set(((-leftThumb)) * speedMultiplier);
+    		canBL.set(((-leftThumb)) * speedMultiplier);
+    		
+    		canBR.set(((leftThumb - (rightThumb * turnRad))) * speedMultiplier);
+    		canFR.set(((leftThumb - (rightThumb * turnRad))) * speedMultiplier);
+    	}
+    	
+    	//If left thumbstick is positive and right thumbstick is negative
+    	
+    	if((leftThumb > deadZ) && (rightThumb < -deadZ))
+    	{
+    		canFL.set(((-(leftThumb + (rightThumb * turnRad)))) * speedMultiplier);
+    		canBL.set(((-(leftThumb + (rightThumb * turnRad)))) * speedMultiplier);
+		
+    		canBR.set(((leftThumb)) * speedMultiplier);
+    		canFR.set(((leftThumb)) * speedMultiplier);
+    	}
+    	
+    	//If left thumbstick is negative and right thumbstick is positive
+    	
+    	if((leftThumb < -deadZ) && (rightThumb > deadZ))
+    	{
+    		canFL.set(((-(leftThumb + (rightThumb * turnRad)))) * speedMultiplier);
+    		canBL.set(((-(leftThumb + (rightThumb * turnRad)))) * speedMultiplier);
+    		
+    		canBR.set(((leftThumb)) * speedMultiplier);
+    		canFR.set(((leftThumb)) * speedMultiplier);
+    	}
+    	
+    	//If left thumbstick is negative and right thumbstick is negative
+    	
+    	if((leftThumb < -deadZ) && (rightThumb < -deadZ))
+    	{
+    		canFL.set(((-leftThumb)) * speedMultiplier);
+    		canBL.set(((-leftThumb)) * speedMultiplier);
+    		
+    		canBR.set(((leftThumb - (rightThumb * turnRad))) * speedMultiplier);
+    		canFR.set(((leftThumb - (rightThumb * turnRad))) * speedMultiplier);
+    	}
+
+    }
+       
+    public void armMotorsE()
+    {
+    	//Arm motors
+    	
+    	//Assign xbox values to variables
+    	
+		leftThumb2 = buttonJ2Ljoy;
+    	rightThumb2 = buttonJ2Rjoy;
+    	
+    	deadZ2 = 0.17;
+    	
+    	//If left thumbstick is still
+
+    	if((leftThumb2>-deadZ2) && (leftThumb2<deadZ2)) 
+    	{
+    		talArmLeft.set(-(rightThumb2));
+
+    		talArmRight.set(-(rightThumb2));
+    	}
+
+    	//If right thumbstick is still
+
+    	if((rightThumb2>-deadZ2) && (rightThumb2<deadZ2)) 
+    	{
+    		talArmLeft.set(leftThumb2);
+
+    		talArmRight.set(-leftThumb2);
+    	}
+
+    	//If left thumbstick is positive and right thumbstick is positive
+
+    	if((leftThumb2>deadZ2) && (rightThumb2>deadZ2)) 
+    	{
+    		talArmLeft.set(leftThumb2 - (rightThumb2 * 0.9));
+
+    		talArmRight.set(-(leftThumb2));
+    	}
+
+    	//If left thumbstick is positive and right thumbstick is negative
+
+    	if((leftThumb2>deadZ2) && (rightThumb2<-deadZ2)) 
+    	{
+    		talArmLeft.set(leftThumb2);
+
+    		talArmRight.set(-(leftThumb2 + (rightThumb2 * 0.9)));
+    	}
+
+    	//If left thumbstick is negative and right thumbstick is positive
+
+    	if((leftThumb2<-deadZ2) && (rightThumb2>deadZ2)) 
+    	{
+    		talArmLeft.set(leftThumb2 + (rightThumb2 * 0.9));
+
+    		talArmRight.set(-(leftThumb2));
+    	}
+
+    	//If left thumbstick is negative and right thumbstick is negative
+
+    	if((leftThumb2<-deadZ2) && (rightThumb2<-deadZ2)) 
+    	{
+    		talArmLeft.set(leftThumb2);
+
+    		talArmRight.set(-(leftThumb2 - (rightThumb2 * 0.9))); 	
+    	}
+    }
+       
+    public void elevatorE()
+    	
+    {
+    	
+    	//Elevator Motors [Y = Up B = Down]
+    	
+     		if((buttonJ2Rtrig > 0) && (buttonJ2Ltrig > 0))
+        	{
+        		canWinch.set(0);
+        		canWinch2.set(0);
+        	}
+     		
+     		if((buttonJ2Rtrig < 0.01) && (buttonJ2Ltrig < 0.01))
+        	{
+        		canWinch.set(0);
+        		canWinch2.set(0);
+        	}
+     		
+        	if((buttonJ2Rtrig > 0) && (buttonJ2Ltrig < 0.01) && (elevatorMax == true))
+        	{
+        		elevatorManual = true;
+        		gotoSpot=false;
+        		canWinch.set(-(joy2.getRawAxis(3)));
+        		canWinch2.set(-(joy2.getRawAxis(3)));
+        	}
+        	
+        	if((buttonJ2Rtrig > 0) && (buttonJ2Ltrig < 0.01) && (!elevatorMax))
+        	{
+        		canWinch.set(0);
+        		canWinch2.set(0);
+        	}
+        	
+        	if((buttonJ2Rtrig < 0.001) && (buttonJ2Ltrig > 0) && (elevatorMin == true))
+        	{
+        		elevatorManual = true;
+        		gotoSpot=false;
+        		canWinch.set(joy2.getRawAxis(2));
+        		canWinch2.set(joy2.getRawAxis(2));
+        	}
+        	
+        	if((buttonJ2Rtrig < 0.001) && (buttonJ2Ltrig > 0) && (!elevatorMin))
+        	{
+        		canWinch.set(0);
+        		canWinch2.set(0);
+        	}
+        	
+        //Use button on the first controller to reset the elevator encoder, useful for not fucking up the threaded rod :P
+        	
+    	if(buttonJ1B7 == true)
+    	{
+    		encoderElevator.reset();
+    	}
+    }
 }

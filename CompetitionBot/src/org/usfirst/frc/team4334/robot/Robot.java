@@ -143,6 +143,8 @@ public class Robot extends IterativeRobot
 	
     public void robotInit()
     {
+    	
+    	prefs = Preferences.getInstance();
    	
     	canFL = new CANTalon(1); // Declaring shit
     	canBL = new CANTalon(2);
@@ -199,8 +201,10 @@ public class Robot extends IterativeRobot
     	speedMultiplier = 1;
     	turnRad = 0.74;
     	goOnce = true;
-    
-    	//autoMode = prefs.getInt("Auto Mode", 0); // Determining which auto mode should be used from the preferences table on SmartDashboard
+    	
+    	camSet1 = prefs.getDouble("Cam_Out", 2.91);
+    	camSet2 = prefs.getDouble("Cam_In", 2.5);
+    	autoMode = prefs.getInt("Auto_Mode", 0); // Determining which auto mode should be used from the preferences table on SmartDashboard
     }
 
     
@@ -276,14 +280,14 @@ public class Robot extends IterativeRobot
 			elevatorThread.schedule(new TimerTask(){public void run(){elevatorOneTote();}}, 20, 20); // Starting threads
 			elevatorThread2.schedule(new TimerTask(){public void run(){elevatorLow();}}, 20, 20);
 			sensorThread.schedule(new TimerTask(){public void run(){getSensors();}}, 20, 20);
-			
+		
 			teleOpOnce = false; // Ending if statement so it only runs once
 		}
-		
-		camera = CameraServer.getInstance();
-		camera.setQuality(50);
-		camera.startAutomaticCapture("cam0");
-    	
+
+		//camera = CameraServer.getInstance();
+		//camera.setQuality(50);
+		//camera.startAutomaticCapture("cam0");
+
     	arcadeDrive();
     	
     	armMotors();
@@ -322,6 +326,8 @@ public class Robot extends IterativeRobot
     	SmartDashboard.putString(gearPos, gearPos2);
     	SmartDashboard.putNumber("Speed Multiplier", speedMultiplier);
     	SmartDashboard.putNumber("Turn Multiplier", turnRad);
+    	SmartDashboard.putNumber("Cam Out", camSet1); 
+    	SmartDashboard.putNumber("Cam In", camSet2); 
     }
     
     public void elevatorLow()

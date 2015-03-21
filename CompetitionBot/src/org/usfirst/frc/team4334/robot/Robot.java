@@ -36,13 +36,12 @@
 
 package org.usfirst.frc.team4334.robot;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.CANTalon;
+import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.CounterBase.EncodingType;
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -70,6 +69,8 @@ public class Robot extends IterativeRobot
    
 	Joystick joy;	//Xbox controllers
 	Joystick joy2;
+	
+	CameraServer camera;
 	
 	CANTalon canFL; // Talon SRXs
     CANTalon canBL;
@@ -194,45 +195,18 @@ public class Robot extends IterativeRobot
     	encoderR.reset();
     	encoderElevator.reset(); 
     	teleOpOnce = true;
-    	autoMode = 0;
+    	autoMode = 1;
     	speedMultiplier = 1;
     	turnRad = 0.74;
     	goOnce = true;
-    }
-    	//controller 1 list defines
-        List<Boolean> J1B1 = new ArrayList<Boolean>();
-        List<Boolean> J1B2 = new ArrayList<Boolean>();
-        List<Boolean> J1B3 = new ArrayList<Boolean>();
-        List<Boolean> J1B4 = new ArrayList<Boolean>();
-        List<Boolean> J1B5 = new ArrayList<Boolean>();
-        List<Boolean> J1B6 = new ArrayList<Boolean>();
-        List<Boolean> J1B7 = new ArrayList<Boolean>();
-        List<Boolean> J1B8 = new ArrayList<Boolean>();
-        List<Boolean> J1B9 = new ArrayList<Boolean>();
-        List<Boolean> J1B10 = new ArrayList<Boolean>();
-        List<Double> J1Ljoy = new ArrayList<Double>();
-        List<Double> J1Rjoy = new ArrayList<Double>();
-        
-      //controller 2 list defines
-        List<Boolean> J2B1 = new ArrayList<Boolean>();
-        List<Boolean> J2B2 = new ArrayList<Boolean>();
-        List<Boolean> J2B3 = new ArrayList<Boolean>();
-        List<Boolean> J2B4 = new ArrayList<Boolean>();
-        List<Boolean> J2B5 = new ArrayList<Boolean>();
-        List<Boolean> J2B6 = new ArrayList<Boolean>();
-        List<Boolean> J2B7 = new ArrayList<Boolean>();
-        List<Boolean> J2B8 = new ArrayList<Boolean>();
-        List<Boolean> J2B9 = new ArrayList<Boolean>();
-        List<Boolean> J2B10 = new ArrayList<Boolean>();
-        int loops = 0;
     
     	//autoMode = prefs.getInt("Auto Mode", 0); // Determining which auto mode should be used from the preferences table on SmartDashboard
-    
+    }
 
     
     public void autonomousInit()
     {
-    	 
+    	
     }
     
     /**
@@ -241,97 +215,6 @@ public class Robot extends IterativeRobot
     
     public void autonomousPeriodic()
     {
-    	arcadeDrive();
-    	
-    	armMotors();
-    	
-    	elevator();
-    	
-    	buttonToggles();
-    	
-    	camFullManual();
-    	
-    	camSetpoint();
-    	
-    	smartDashboard();
-    	//controller 1 adding value to list
-        J1B1.add(joy.getRawButton(1));
-        J1B2.add(joy.getRawButton(2));
-        J1B3.add(joy.getRawButton(3));
-        J1B4.add(joy.getRawButton(4));
-        J1B5.add(joy.getRawButton(5));
-        J1B6.add(joy.getRawButton(6));
-        J1B7.add(joy.getRawButton(7));
-        J1B8.add(joy.getRawButton(8));
-        J1B9.add(joy.getRawButton(9));
-        J1B10.add(joy.getRawButton(10));
-        J1Rjoy.add(joy.getRawAxis(4));
-        J1Ljoy.add(joy.getRawAxis(1));
-        
-        //controller 2 adding value to list
-        J2B1.add(joy.getRawButton(1));
-        J2B2.add(joy.getRawButton(2));
-        J2B3.add(joy.getRawButton(3));
-        J2B4.add(joy.getRawButton(4));
-        J2B5.add(joy.getRawButton(5));
-        J2B6.add(joy.getRawButton(6));
-        J2B7.add(joy.getRawButton(7));
-        J2B8.add(joy.getRawButton(8));
-        J2B9.add(joy.getRawButton(9));
-        J2B10.add(joy.getRawButton(10));
-        
-        loops++;
-        if(loops > 4){
-        	loops = 0;
-        	
-        	//printing controller 1 lists
-        	System.out.println("joy1 button1: "+J1B1);   
-        	System.out.println("joy1 button2: "+J1B2);
-        	System.out.println("joy1 button3: "+J1B3);
-        	System.out.println("joy1 button4: "+J1B4);
-        	System.out.println("joy1 button5: "+J1B5);
-        	System.out.println("joy1 button6: "+J1B6);
-        	System.out.println("joy1 button7: "+J1B7);
-        	System.out.println("joy1 button8: "+J1B8);
-        	System.out.println("joy1 button9: "+J1B9);
-        	System.out.println("joy1 button10: "+J1B10);
-        	System.out.println();
-        	
-        	//printing controller 2 lists
-        	System.out.println("joy2 button1: "+J2B1);   
-        	System.out.println("joy2 button2: "+J2B2);
-        	System.out.println("joy2 button3: "+J2B3);
-        	System.out.println("joy2 button4: "+J2B4);
-        	System.out.println("joy2 button5: "+J2B5);
-        	System.out.println("joy2 button6: "+J2B6);
-        	System.out.println("joy2 button7: "+J2B7);
-        	System.out.println("joy2 button8: "+J2B8);
-        	System.out.println("joy2 button9: "+J2B9);
-        	System.out.println("joy2 button10: "+J2B10);
-        	
-        	//clearing lists
-        	J1B1.clear();
-        	J1B2.clear();
-        	J1B3.clear();
-        	J1B4.clear();
-        	J1B5.clear();
-        	J1B6.clear();
-        	J1B7.clear();
-        	J1B8.clear();
-        	J1B9.clear();
-        	J1B10.clear();
-        	
-        	J2B1.clear();
-        	J2B2.clear();
-        	J2B3.clear();
-        	J2B4.clear();
-        	J2B5.clear();
-        	J2B6.clear();
-        	J2B7.clear();
-        	J2B8.clear();
-        	J2B9.clear();
-        	J2B10.clear();
-        }
     	if(goOnce) // Allows Auto to run only once instead of 20x per second
     	{
        		elevatorThread2Auto.schedule(new TimerTask(){public void run(){elevatorLow();}}, 20, 20); //Starting Threads for auto
@@ -396,6 +279,10 @@ public class Robot extends IterativeRobot
 			
 			teleOpOnce = false; // Ending if statement so it only runs once
 		}
+		
+		camera = CameraServer.getInstance();
+		camera.setQuality(50);
+		camera.startAutomaticCapture("cam0");
     	
     	arcadeDrive();
     	
@@ -496,12 +383,12 @@ public class Robot extends IterativeRobot
     		leftArm.set(DoubleSolenoid.Value.kForward);
 			rightArm.set(DoubleSolenoid.Value.kForward);
     		
-    		if ((elevatorMax) && (elevatorR <= 7900))
+    		if ((elevatorMax) && (elevatorR <= 10700))
     		{
     			canWinch.set(-0.8);
     			canWinch2.set(0.8);
     		}
-    		else if((elevatorMax) && (elevatorR > 7900))
+    		else if((elevatorMax) && (elevatorR > 10700))
     		{
     			canWinch.set(-0.33);
     			canWinch2.set(0.33);
@@ -1142,7 +1029,8 @@ public class Robot extends IterativeRobot
 		canFR.set(0);
 		
 		encoderL.reset();
-    } 
+    
+    }
 
     public void moveArms(int time, int power)
     {

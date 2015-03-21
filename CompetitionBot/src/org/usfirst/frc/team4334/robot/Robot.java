@@ -58,7 +58,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 // [COPYRIGHT] Alberta Tech Alliance 2015. All rights reserved.
 
-public class Robot extends IterativeRobot {
+public class Robot extends IterativeRobot 
+{
     
     //This function is run when the robot is first started up and should be
     //used for any initialization code.
@@ -86,7 +87,6 @@ public class Robot extends IterativeRobot {
 	Timer elevatorThreadAuto;
 	Timer elevatorThread2Auto;	
 	Timer sensorThread;
-	Timer arcadeThread;
 	Timer elevatorThread;
 	Timer elevatorThread2;
 	Timer camThreadAuto;
@@ -104,13 +104,14 @@ public class Robot extends IterativeRobot {
     
     String gearPos, gearPos2; // Strings for the smartdasboard gear positions
     
-    double leftThumb2,rightThumb2; 		// Variables where second Xbox thumbstick values are stored
-    double leftTrig,rightTrig;	   		// Variables where Xbox trigger values are stored
-    double leftTrig2,rightTrig2;		// Variables where second Xbox trigger values are stored
-    double degrees, potDegrees;			// Variables where Potentiometer values are stored
-	double leftThumb,rightThumb;		// Variables where first Xbox thumbstick values are stored
-	double turnRad, speedMultiplier;	// Variables for turning radius and overall speed multiplier
-	double deadZ, deadZ2;				// Variables that store deadzones
+    double leftThumb2,rightThumb2; 	// Variables where second Xbox thumbstick values are stored
+    double leftTrig,rightTrig;	   	// Variables where Xbox trigger values are stored
+    double leftTrig2,rightTrig2;	// Variables where second Xbox trigger values are stored
+    double degrees, potDegrees;		// Variables where Potentiometer values are stored
+	double leftThumb,rightThumb;	// Variables where first Xbox thumbstick values are stored
+	double turnRad, speedMultiplier;// Variables for turning radius and overall speed multiplier
+	double deadZ, deadZ2;			// Variables that store deadzones
+	double camSet1, camSet2;		// Variables that decide that setpoints the cam uses
 	
     boolean stillPressed;	//Booleans to stop button presses from repeating 20 x per second lol
     boolean stillPressed2;
@@ -121,6 +122,7 @@ public class Robot extends IterativeRobot {
     boolean stillPressed7;
     boolean stillPressed8;
     boolean stillPressed9;
+    boolean stillPressed10;
     boolean elevatorMax;	//Booleans for elevator limit switches
     boolean elevatorMin;
     boolean elevatorManual;	//Boolean to decide whether manual elevator control is allowed
@@ -153,7 +155,6 @@ public class Robot extends IterativeRobot {
     	elevatorThread = new Timer();
     	elevatorThread2 = new Timer();
     	sensorThreadAuto = new Timer();
-    	arcadeThread = new Timer();
     	elevatorThreadAuto = new Timer();
     	elevatorThread2Auto = new Timer();
     	camThreadAuto = new Timer();
@@ -191,8 +192,11 @@ public class Robot extends IterativeRobot {
     	encoderR.reset();
     	encoderElevator.reset(); 
     	teleOpOnce = true;
-    	autoMode = 4;
+    	autoMode = 1;
+    	speedMultiplier = 1;
+    	turnRad = 0.74;
     	goOnce = true;
+    
     	//autoMode = prefs.getInt("Auto Mode", 0); // Determining which auto mode should be used from the preferences table on SmartDashboard
     }
 
@@ -266,27 +270,26 @@ public class Robot extends IterativeRobot {
     {
 		if(teleOpOnce) // Everything that should only be run once goes in here
 		{
-			//Starting new threads for Teleop
-			
+			elevatorThread.schedule(new TimerTask(){public void run(){elevatorOneTote();}}, 20, 20); // Starting threads
+			elevatorThread2.schedule(new TimerTask(){public void run(){elevatorLow();}}, 20, 20);
 			sensorThread.schedule(new TimerTask(){public void run(){getSensors();}}, 20, 20);
-			arcadeThread.schedule(new TimerTask(){public void run(){arcadeDrive();}}, 20, 20);
 			
 			teleOpOnce = false; // Ending if statement so it only runs once
 		}
     	
-		elevatorOneTote();
-		
-		elevatorLow();
-		
+    	arcadeDrive();
+    	
     	armMotors();
     	
     	elevator();
-    		
+    	
     	buttonToggles();
     	
     	camFullManual();
     	
     	camSetpoint();
+    	
+    	smartDashboard();
     	
     }
 
@@ -301,33 +304,45 @@ public class Robot extends IterativeRobot {
    
     //Teleop methods
     
+    public void smartDashboard()
+    {
+    	//Printing info for the smartdashboard
+    	
+    	SmartDashboard.putNumber("Elevator Encoder", elevatorR); 
+    	SmartDashboard.putNumber("Cam Potentiometer", potDegrees); 
+    	SmartDashboard.putBoolean("High Limit Switch", elevatorMax);   
+    	SmartDashboard.putBoolean("Low Limit Switch", elevatorMin);   
+    	SmartDashboard.putString(gearPos, gearPos2);
+    	SmartDashboard.putNumber("Speed Multiplier", speedMultiplier);
+    	SmartDashboard.putNumber("Turn Multiplier", turnRad);
+    }
+    
     public void elevatorLow()
     {
     	if (joy2.getRawButton(3) == false) {stillPressed7 = false;}
     	
     	if (joy2.getRawButton(3) && (stillPressed7 == false))
     	{
-    		camActivate = true;
+    		gotoSpot2 = true;
     		gotoCam1 = false;
 			gotoCam2 = true;
-    		wait(350);
-    		gotoSpot2 = true;
+    		camActivate = true;
     		stillPressed7 = true;
     	}
     	
     	if (gotoSpot2)
     	{
-    		
+
     		leftArm.set(DoubleSolenoid.Value.kForward);
 			rightArm.set(DoubleSolenoid.Value.kForward);
     		
-    		if ((elevatorMin) && (elevatorR >= 1500))
+    		if ((elevatorMin) && (elevatorR >= 1100))
     		{
     			canWinch.set(0.4);
     			canWinch2.set(0.4);
     		}
     		
-    		else if((elevatorMin) && (elevatorR < 1500))
+    		else if((elevatorMin) && (elevatorR < 1100))
     		{
     			canWinch.set(0.2);
     			canWinch2.set(0.2);
@@ -393,13 +408,11 @@ public class Robot extends IterativeRobot {
     	
     	if (gotoSpot)
     	{
-    		
-    		getSensors();
-
+    
     		leftArm.set(DoubleSolenoid.Value.kForward);
 			rightArm.set(DoubleSolenoid.Value.kForward);
     		
-    		if (elevatorR < 7500)
+    		if (elevatorR < 10768)
     		{
     			canWinch.set(-1);
     			canWinch2.set(-1);
@@ -435,6 +448,28 @@ public class Robot extends IterativeRobot {
     public void buttonToggles()
     
     {
+    	//Arcade mode speed switcher
+    	
+    	if (joy.getRawButton(3) == false) {stillPressed10 = false;}
+    	
+    	if (joy.getRawButton(3) && (stillPressed10 == false))
+    	{
+    		if (speedMultiplier == 1)
+			{
+				speedMultiplier = 0.4;
+				turnRad = 1.8;
+				stillPressed10 = true;
+				
+			}
+    		else if (speedMultiplier == 0.4)
+    		{
+    			speedMultiplier = 1;
+    			turnRad = 0.74;
+    			stillPressed10 = true;
+    		}
+    		
+    	}
+    	
     	//Smartdashboard gear position string changer
     	
     	if(gearShift.get() == DoubleSolenoid.Value.kForward)
@@ -567,7 +602,7 @@ public class Robot extends IterativeRobot {
     		if(gotoCam1)
     		{
 
-        		if (potDegrees < 3.1)
+        		if (potDegrees < 2.91)
         		{
         			talKicker.set(-1);
         		}
@@ -582,7 +617,7 @@ public class Robot extends IterativeRobot {
     		if(!gotoCam1)
     		{
 
-    			if (potDegrees > 2.73)
+    			if (potDegrees > 2.5)
         		{
         			talKicker.set(1);
         		}
@@ -606,12 +641,8 @@ public class Robot extends IterativeRobot {
     	leftThumb = -(joy.getRawAxis(1));
     	
     	//Define the speed multiplier, deadzones and turning radius multiplier
-    	
-    	speedMultiplier = 1;
      	
     	deadZ = 0.25;
-    	
-    	turnRad = 0.74;
     	
     	//If left thumbstick is still
     	
@@ -759,12 +790,12 @@ public class Robot extends IterativeRobot {
         		canWinch2.set(0);
         	}
      		
-     		if((joy2.getRawAxis(3) < 0.001) && (joy2.getRawAxis(2) < 0.01))
+     		if((joy2.getRawAxis(3) < 0.01) && (joy2.getRawAxis(2) < 0.01))
         	{
         		canWinch.set(0);
         		canWinch2.set(0);
         	}
-        	
+     		
         	if((joy2.getRawAxis(3) > 0) && (joy2.getRawAxis(2) < 0.01) && (elevatorMax == true))
         	{
         		elevatorManual = true;
@@ -773,14 +804,26 @@ public class Robot extends IterativeRobot {
         		canWinch2.set(-(joy2.getRawAxis(3)));
         	}
         	
+        	if((joy2.getRawAxis(3) > 0) && (joy2.getRawAxis(2) < 0.01) && (!elevatorMax))
+        	{
+        		canWinch.set(0);
+        		canWinch2.set(0);
+        	}
+        	
         	if((joy2.getRawAxis(3) < 0.001) && (joy2.getRawAxis(2) > 0) && (elevatorMin == true))
         	{
         		elevatorManual = true;
         		gotoSpot=false;
         		canWinch.set(joy2.getRawAxis(2));
         		canWinch2.set(joy2.getRawAxis(2));
-        }
-    	
+        	}
+        	
+        	if((joy2.getRawAxis(3) < 0.001) && (joy2.getRawAxis(2) > 0) && (!elevatorMin))
+        	{
+        		canWinch.set(0);
+        		canWinch2.set(0);
+        	}
+        	
         //Use button on the first controller to reset the elevator encoder, useful for not fucking up the threaded rod :P
         	
     	if(joy.getRawButton(7) == true)
@@ -811,11 +854,7 @@ public class Robot extends IterativeRobot {
     	
     	SmartDashboard.putNumber("Left Encoder", leftR);
     	SmartDashboard.putNumber("Right Encoder", rightR);
-    	SmartDashboard.putNumber("Elevator Encoder", elevatorR); 
-    	SmartDashboard.putNumber("Cam Potentiometer", potDegrees); 
-    	SmartDashboard.putBoolean("High Limit Switch", elevatorMax);   
-    	SmartDashboard.putBoolean("Low Limit Switch", elevatorMin);   
-    	SmartDashboard.putString(gearPos, gearPos2);	
+    	SmartDashboard.putNumber("Elevator Encoder", elevatorR);
     }
     
     public void drive(int distance, double power)
@@ -847,19 +886,12 @@ public class Robot extends IterativeRobot {
 	
     }
     
-    public void arms(boolean InOrOut)
+    public void armsClose()
     {
-    	if(InOrOut)
-    	{
-    		leftArm.set(DoubleSolenoid.Value.kReverse);  
-    		rightArm.set(DoubleSolenoid.Value.kReverse);
-    	}
+    	//Sets the arms solenoids to open
     	
-    	else if(!InOrOut)
-    	{
-    		leftArm.set(DoubleSolenoid.Value.kForward);
-    		rightArm.set(DoubleSolenoid.Value.kForward);
-    	}
+    	leftArm.set(DoubleSolenoid.Value.kReverse);  
+		rightArm.set(DoubleSolenoid.Value.kReverse);
     	
     }
     
@@ -870,8 +902,107 @@ public class Robot extends IterativeRobot {
 		rightArm.set(DoubleSolenoid.Value.kForward);
     	
     }
-   
-    public void turn(double turnDegrees, double power)
+    
+    public void leftTurn90(double power)
+    {
+    	//Sets the drivetrain motors to the given power to make a right angle turn
+    	
+    	while(rightR < 550)
+    	{
+    		canFL.set(power);
+    		canBL.set(power);
+    		
+    		canBR.set(power);
+    		canFR.set(power);
+    	}
+    	canFL.set(0);
+		canBL.set(0);
+		
+		canBR.set(0);
+		canFR.set(0);
+		
+		encoderL.reset();
+    
+    }
+    
+    public void rightTurn90(double power)
+    {
+    	//Sets the drivetrain motors to the given power to make a right angle turn
+    	
+    	while(rightR < 550)
+    	{
+    		canFL.set(-power);
+    		canBL.set(-power);
+    		
+    		canBR.set(-power);
+    		canFR.set(-power);
+    	}
+    	canFL.set(0);
+		canBL.set(0);
+		
+		canBR.set(0);
+		canFR.set(0);
+		
+		encoderL.reset();
+    }
+    
+    public void leftTurn45(double power)
+    {
+    	//Sets the drivetrain motors to the given power to make a 45 degree turn
+    	
+    	canFL.set(power);
+		canBL.set(power);
+		
+		canBR.set(power);
+		canFR.set(power);
+		
+		//Waits for the given time
+		
+		try {
+			Thread.sleep(353);
+		} catch (InterruptedException e) {
+			
+			Thread.currentThread().interrupt();
+		}
+		
+		//Stops
+    	
+    	canFL.set(0);
+		canBL.set(0);
+		
+		canBR.set(0);
+		canFR.set(0);
+    }
+    
+    public void rightTurn45(double power)
+    {
+    	//Sets the drivetrain motors to the given power to make a 45 degree turn
+    	
+    	canFL.set(-power);
+		canBL.set(-power);
+		
+		canBR.set(-power);
+		canFR.set(-power);
+		
+		//Waits for the given time
+		
+		try {
+			Thread.sleep(353);
+		} catch (InterruptedException e) {
+			
+			Thread.currentThread().interrupt();
+		}
+		
+		//Stops
+    	
+    	canFL.set(0);
+		canBL.set(0);
+		
+		canBR.set(0);
+		canFR.set(0);
+    }
+    
+    public void setTurn(double turnDegrees, double power)
     {
     	//Sets the drivetrain motors to the given power to make a right angle turn
 	  
@@ -916,17 +1047,18 @@ public class Robot extends IterativeRobot {
 		talArmRight.set(0);
     }
     
-    public void stinger(boolean InOrOut)
+    public void stingerOut()
     {
-    	if(InOrOut)
-    	{
-    		flipper.set(DoubleSolenoid.Value.kForward);
-    	}
+    	//Sets the stinger solenoid to out
     	
-    	else if(!InOrOut)
-    	{
-    		flipper.set(DoubleSolenoid.Value.kReverse);
-    	}
+    	flipper.set(DoubleSolenoid.Value.kForward);
+    }
+    
+    public void stingerIn()
+    {
+    	//Sets the stinger solenoid to in
+    	
+    	flipper.set(DoubleSolenoid.Value.kReverse);
     }
     
     public void wait(int Milliseconds)
@@ -969,7 +1101,7 @@ public class Robot extends IterativeRobot {
     
     public void moveToZoneAuto()
     {
-    	drive(400, -0.5);
+    	drive(750, -0.5);
     	
     	elevatorThreadAuto.cancel();
     	elevatorThread2Auto.cancel();
@@ -980,7 +1112,7 @@ public class Robot extends IterativeRobot {
     {
     	armsClose();
     	
-    	turn(90, -1);
+    	setTurn(90, -1);
     	
     	drive(1400, 0.5);
     	
@@ -995,7 +1127,7 @@ public class Robot extends IterativeRobot {
     {
     	armsClose();
     	
-    	turn(90, 1);
+    	setTurn(90, 1);
     	
     	drive(1400, 0.6);
     	
@@ -1024,7 +1156,7 @@ public class Robot extends IterativeRobot {
 		
 		wait(900);
 		
-    	stinger(true);
+    	stingerOut();
     	
     	wait(1000);
     	
@@ -1032,7 +1164,7 @@ public class Robot extends IterativeRobot {
     	
 		wait(700);
 		
-    	stinger(false);
+    	stingerIn();
     	
     	elevatorThreadAuto.cancel();
     	elevatorThread2Auto.cancel();

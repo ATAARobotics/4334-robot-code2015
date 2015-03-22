@@ -94,7 +94,12 @@ public class Robot extends IterativeRobot
 	Timer elevatorThread2;
 	Timer camThreadAuto;
 	Timer camThread;
+<<<<<<< HEAD
 
+=======
+	Timer recording;
+	Timer Brutally_Murder_And_Kill_In_A_Very_Violent_Death;
+>>>>>>> origin/master
 	AnalogInput pot1;		//Potentiometer, Compressor and solenoids
 	Compressor comp;
     DoubleSolenoid gearShift;
@@ -164,6 +169,11 @@ public class Robot extends IterativeRobot
     	elevatorThread2Auto = new Timer();
     	camThreadAuto = new Timer();
     	camThread = new Timer();
+<<<<<<< HEAD
+=======
+    	recording = new Timer();
+    	Brutally_Murder_And_Kill_In_A_Very_Violent_Death = new Timer();
+>>>>>>> origin/master
     
     	elevatorManual = false;
     	camMode = 1;
@@ -225,7 +235,7 @@ public class Robot extends IterativeRobot
     		elevatorThreadAuto.schedule(new TimerTask(){public void run(){elevatorOneTote();}}, 20, 20);
     		sensorThread.schedule(new TimerTask(){public void run(){getSensors();}}, 20, 20);
     		camThreadAuto.schedule(new TimerTask(){public void run(){camSetpoint();}}, 20, 20);
-    		
+    		Brutally_Murder_And_Kill_In_A_Very_Violent_Death.schedule(new TimerTask(){public void run(){kill_All_The_Things();}}, 15000);
     		if(autoMode == 0)
     		{
     			goOnce = false;
@@ -343,6 +353,7 @@ public class Robot extends IterativeRobot
     		stillPressed7 = true;
     	}
     	
+    	// line not found
     	if (gotoSpot2)
     	{
 
@@ -351,8 +362,8 @@ public class Robot extends IterativeRobot
     		
     		if ((elevatorMin) && (elevatorR >= 1100))
     		{
-    			canWinch.set(0.4);
-    			canWinch2.set(0.4);
+    			canWinch.set(0.6);
+    			canWinch2.set(0.6);
     		}
     		
     		else if((elevatorMin) && (elevatorR < 1100))
@@ -425,7 +436,7 @@ public class Robot extends IterativeRobot
     		leftArm.set(DoubleSolenoid.Value.kForward);
 			rightArm.set(DoubleSolenoid.Value.kForward);
     		
-    		if (elevatorR < 10768)
+    		if ((elevatorR < 10768) && (elevatorMax))
     		{
     			canWinch.set(-1);
     			canWinch2.set(-1);
@@ -809,7 +820,7 @@ public class Robot extends IterativeRobot
         		canWinch2.set(0);
         	}
      		
-        	if((joy2.getRawAxis(3) > 0) && (joy2.getRawAxis(2) < 0.01) && (elevatorMax == true))
+        	if((joy2.getRawAxis(3) > 0) && (joy2.getRawAxis(2) < 0.01) && (elevatorMax))
         	{
         		elevatorManual = true;
         		gotoSpot=false;
@@ -823,7 +834,7 @@ public class Robot extends IterativeRobot
         		canWinch2.set(0);
         	}
         	
-        	if((joy2.getRawAxis(3) < 0.001) && (joy2.getRawAxis(2) > 0) && (elevatorMin == true))
+        	if((joy2.getRawAxis(3) < 0.001) && (joy2.getRawAxis(2) > 0) && (elevatorMin))
         	{
         		elevatorManual = true;
         		gotoSpot=false;
@@ -1142,7 +1153,7 @@ public class Robot extends IterativeRobot
     	
     	setTurn(90, 1);
     	
-    	drive(1400, 0.6);
+    	drive(1400, 0.5);
     	
     	armsOpen();
     	
@@ -1183,5 +1194,385 @@ public class Robot extends IterativeRobot
     	elevatorThread2Auto.cancel();
     	sensorThreadAuto.cancel();
     }
+<<<<<<< HEAD
+=======
+    
+    public void record(){
+    	//controller 1 adding value to list
+        J1B1.add(joy.getRawButton(1));
+        J1B2.add(joy.getRawButton(2));
+        J1B3.add(joy.getRawButton(3));
+        J1B4.add(joy.getRawButton(4));
+        J1B5.add(joy.getRawButton(5));
+        J1B6.add(joy.getRawButton(6));
+        J1B7.add(joy.getRawButton(7));
+        J1B8.add(joy.getRawButton(8));
+        J1B9.add(joy.getRawButton(9));
+        J1B10.add(joy.getRawButton(10));
+        J1Rjoy.add(joy.getRawAxis(4));
+        J1Ljoy.add(joy.getRawAxis(1));
+        
+        //controller 2 adding value to list
+        J2B1.add(joy.getRawButton(1));
+        J2B2.add(joy.getRawButton(2));
+        J2B3.add(joy.getRawButton(3));
+        J2B4.add(joy.getRawButton(4));
+        J2B5.add(joy.getRawButton(5));
+        J2B6.add(joy.getRawButton(6));
+        J2B7.add(joy.getRawButton(7));
+        J2B8.add(joy.getRawButton(8));
+        J2B9.add(joy.getRawButton(9));
+        J2B10.add(joy.getRawButton(10));
+        J2Rjoy.add(joy2.getRawAxis(4));
+        J2Ljoy.add(joy2.getRawAxis(1));
+        J2Ltrig.add(joy2.getRawAxis(2));
+        J2Rtrig.add(joy2.getRawAxis(3));
+        
+        
+        loops++;
+       /* if(loops > 4){
+        	loops = 0;
+        	
+        	//printing controller 1 lists
+        	System.out.println("joy1 button1: "+J1B1);   
+        	System.out.println("joy1 button2: "+J1B2);
+        	System.out.println("joy1 button3: "+J1B3);
+        	System.out.println("joy1 button4: "+J1B4);
+        	System.out.println("joy1 button5: "+J1B5);
+        	System.out.println("joy1 button6: "+J1B6);
+        	System.out.println("joy1 button7: "+J1B7);
+        	System.out.println("joy1 button8: "+J1B8);
+        	System.out.println("joy1 button9: "+J1B9);
+        	System.out.println("joy1 button10: "+J1B10);
+        	System.out.println("joy1 left stick: "+J1Ljoy);
+        	System.out.println("joy1 right stick: "+J1Rjoy);
+        	System.out.println();
+        	
+        	//printing controller 2 lists
+        	System.out.println("joy2 button1: "+J2B1);   
+        	System.out.println("joy2 button2: "+J2B2);
+        	System.out.println("joy2 button3: "+J2B3);
+        	System.out.println("joy2 button4: "+J2B4);
+        	System.out.println("joy2 button5: "+J2B5);
+        	System.out.println("joy2 button6: "+J2B6);
+        	System.out.println("joy2 button7: "+J2B7);
+        	System.out.println("joy2 button8: "+J2B8);
+        	System.out.println("joy2 button9: "+J2B9);
+        	System.out.println("joy2 button10: "+J2B10);
+        	System.out.println("joy2 left stick: "+J2Ljoy);
+        	System.out.println("joy2 right stick: "+J2Rjoy);
+        	System.out.println("joy2 left trigger: "+J2Ltrig);
+        	System.out.println("joy2 right trigger: "+J2Rtrig);
+        	System.out.println();
+        	
+        	//clearing lists
+        	J1B1.clear();
+        	J1B2.clear();
+        	J1B3.clear();
+        	J1B4.clear();
+        	J1B5.clear();
+        	J1B6.clear();
+        	J1B7.clear();
+        	J1B8.clear();
+        	J1B9.clear();
+        	J1B10.clear();
+        	J1Ljoy.clear();
+        	J1Rjoy.clear();
+        	
+        	J2B1.clear();
+        	J2B2.clear();
+        	J2B3.clear();
+        	J2B4.clear();
+        	J2B5.clear();
+        	J2B6.clear();
+        	J2B7.clear();
+        	J2B8.clear();
+        	J2B9.clear();
+        	J2B10.clear();
+        	J2Ljoy.clear();
+        	J2Rjoy.clear();
+        	J2Ltrig.clear();
+        	J2Rtrig.clear();
+        }*/
+    }
+    
+    public void playback(){
+    	boolean[] J1B1 = {};
+    	boolean[] J1B2 = {};
+    	boolean[] J1B3 = {};
+    	boolean[] J1B4 = {};
+    	boolean[] J1B5 = {};
+    	boolean[] J1B6 = {};
+    	boolean[] J1B7 = {};
+    	boolean[] J1B8 = {};
+    	boolean[] J1B9 = {};
+    	boolean[] J1B10 = {};
+    	double[] J1Ljoy = {};
+    	double[] J1Rjoy = {};
+    	
+    	boolean[] J2B1 = {};
+    	boolean[] J2B2 = {};
+    	boolean[] J2B3 = {};
+    	boolean[] J2B4 = {};
+    	boolean[] J2B5 = {};
+    	boolean[] J2B6 = {};
+    	boolean[] J2B7 = {};
+    	boolean[] J2B8 = {};
+    	boolean[] J2B9 = {};
+    	boolean[] J2B10 = {};
+    	double[] J2Ljoy = {};
+    	double[] J2Rjoy = {};
+    	double[] J2Ltrig = {};
+    	double[] J2Rtrig = {};
+    	for (int i = 0; i < J1B1.length; i++){
+    		boolean buttonJ1B1 = J1B1[i];
+    		boolean buttonJ1B2 = J1B2[i];
+    		boolean buttonJ1B3 = J1B3[i];
+    		boolean buttonJ1B4 = J1B4[i];
+    		boolean buttonJ1B5 = J1B5[i];
+    		boolean buttonJ1B6 = J1B6[i];
+    		boolean buttonJ1B7 = J1B7[i];
+    		boolean buttonJ1B8 = J1B8[i];
+    		boolean buttonJ1B9 = J1B9[i];
+    		boolean buttonJ1B10 = J1B10[i];
+    		double buttonJ1Ljoy = J1Ljoy[i];
+    		double buttonJ1Rjoy = J1Rjoy[i];
+    		
+    		boolean buttonJ2B1 = J2B1[i];
+    		boolean buttonJ2B2 = J2B2[i];
+    		boolean buttonJ2B3 = J2B3[i];
+    		boolean buttonJ2B4 = J2B4[i];
+    		boolean buttonJ2B5 = J2B5[i];
+    		boolean buttonJ2B6 = J2B6[i];
+    		boolean buttonJ2B7 = J2B7[i];
+    		boolean buttonJ2B8 = J2B8[i];
+    		boolean buttonJ2B9 = J2B9[i];
+    		boolean buttonJ2B10 = J2B10[i];
+    		double buttonJ2Ljoy = J2Ljoy[i];
+    		double buttonJ2Rjoy = J2Rjoy[i];
+    		double buttonJ2Ltrig = J2Ltrig[i];
+    		double buttonJ2Rtrig = J2Rtrig[i];
+    		
+    		elevatorLowE();
+    		elevatorHighE();
+    		elevatorOneToteE();
+    		camFullManualE();
+    		buttonTogglesE();
+    		arcadeDriveE();
+    		armMotorsE();
+    		elevatorE();
+    		try {
+				Thread.sleep(20);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+    	}
+    	
+    }
+    
+//emulator methods DO NOT TOUCH----------------------------------------------------------------------------------------------------------
+    public void kill_All_The_Things(){
+    	//printing controller 1 lists
+    	System.out.println("joy1 button1: "+J1B1);   
+    	System.out.println("joy1 button2: "+J1B2);
+    	System.out.println("joy1 button3: "+J1B3);
+    	System.out.println("joy1 button4: "+J1B4);
+    	System.out.println("joy1 button5: "+J1B5);
+    	System.out.println("joy1 button6: "+J1B6);
+    	System.out.println("joy1 button7: "+J1B7);
+    	System.out.println("joy1 button8: "+J1B8);
+    	System.out.println("joy1 button9: "+J1B9);
+    	System.out.println("joy1 button10: "+J1B10);
+    	System.out.println("joy1 left stick: "+J1Ljoy);
+    	System.out.println("joy1 right stick: "+J1Rjoy);
+    	System.out.println();
+    	
+    	//printing controller 2 lists
+    	System.out.println("joy2 button1: "+J2B1);   
+    	System.out.println("joy2 button2: "+J2B2);
+    	System.out.println("joy2 button3: "+J2B3);
+    	System.out.println("joy2 button4: "+J2B4);
+    	System.out.println("joy2 button5: "+J2B5);
+    	System.out.println("joy2 button6: "+J2B6);
+    	System.out.println("joy2 button7: "+J2B7);
+    	System.out.println("joy2 button8: "+J2B8);
+    	System.out.println("joy2 button9: "+J2B9);
+    	System.out.println("joy2 button10: "+J2B10);
+    	System.out.println("joy2 left stick: "+J2Ljoy);
+    	System.out.println("joy2 right stick: "+J2Rjoy);
+    	System.out.println("joy2 left trigger: "+J2Ltrig);
+    	System.out.println("joy2 right trigger: "+J2Rtrig);
+    	System.out.println();
+    	
+    	//clearing lists
+    	J1B1.clear();
+    	J1B2.clear();
+    	J1B3.clear();
+    	J1B4.clear();
+    	J1B5.clear();
+    	J1B6.clear();
+    	J1B7.clear();
+    	J1B8.clear();
+    	J1B9.clear();
+    	J1B10.clear();
+    	J1Ljoy.clear();
+    	J1Rjoy.clear();
+    	
+    	J2B1.clear();
+    	J2B2.clear();
+    	J2B3.clear();
+    	J2B4.clear();
+    	J2B5.clear();
+    	J2B6.clear();
+    	J2B7.clear();
+    	J2B8.clear();
+    	J2B9.clear();
+    	J2B10.clear();
+    	J2Ljoy.clear();
+    	J2Rjoy.clear();
+    	J2Ltrig.clear();
+    	J2Rtrig.clear();
+    	
+    	recording.cancel();
+    	Brutally_Murder_And_Kill_In_A_Very_Violent_Death.cancel();
+    	System.out.println("NO LONGER RECORDING, PLEASE STOP!");
+    	System.out.println("NO LONGER RECORDING, PLEASE STOP!");
+    	System.out.println("NO LONGER RECORDING, PLEASE STOP!");
+    	System.out.println("NO LONGER RECORDING, PLEASE STOP!");
+    	System.out.println("NO LONGER RECORDING, PLEASE STOP!");
+    	
+    }
+    
+    public void elevatorLowE()
+    {
+    	if (buttonJ2B3 == false) {stillPressed7 = false;}
+    	
+    	if (buttonJ2B3 && (stillPressed7 == false))
+    	{
+    		gotoSpot2 = true;
+    		gotoCam1 = false;
+			gotoCam2 = true;
+    		camActivate = true;
+    		stillPressed7 = true;
+    	}
+    	
+    	if (gotoSpot2)
+    	{
+
+    		leftArm.set(DoubleSolenoid.Value.kForward);
+			rightArm.set(DoubleSolenoid.Value.kForward);
+    		
+    		if ((elevatorMin) && (elevatorR >= 1100))
+    		{
+    			canWinch.set(0.4);
+    			canWinch2.set(0.4);
+    		}
+    		
+    		else if((elevatorMin) && (elevatorR < 1100))
+    		{
+    			canWinch.set(0.2);
+    			canWinch2.set(0.2);
+    		}
+    		
+    		else 
+    		{
+    			canWinch.set(0);
+    			canWinch2.set(0);
+    			gotoSpot2=false;
+   			}
+    	}
+    }
+    
+    public void elevatorHighE()
+    {
+    	if (buttonJ2B2 == false) {stillPressed9 = false;}
+    	
+    	if (buttonJ2B2 && (stillPressed9 == false))
+    	{
+    		gotoSpot3 = true;
+    		gotoCam1 = true;
+			gotoCam2 = false;
+    		camActivate = true;	
+    		stillPressed9 = true;
+    	}
+    	
+    	if (gotoSpot3)
+    	{
+
+    		leftArm.set(DoubleSolenoid.Value.kForward);
+			rightArm.set(DoubleSolenoid.Value.kForward);
+    		
+    		if ((elevatorMax) && (elevatorR <= 7900))
+    		{
+    			canWinch.set(-0.8);
+    			canWinch2.set(0.8);
+    		}
+    		else if((elevatorMax) && (elevatorR > 7900))
+    		{
+    			canWinch.set(-0.33);
+    			canWinch2.set(0.33);
+    		}
+    		else {
+    			gotoSpot2=false;
+    		}
+    	}
+    }
+    
+    public void elevatorOneToteE()
+    {
+    	if (buttonJ2B4 == false) {stillPressed6 = false;}
+    	
+    	if (buttonJ2B4 && (stillPressed6 == false))
+    	{
+    		gotoSpot = true;
+    		gotoCam1 = true;
+			gotoCam2 = false;
+    		camActivate = true;
+    		stillPressed6 = true;
+    		
+    	}
+    	
+    	if (gotoSpot)
+    	{
+    
+    		leftArm.set(DoubleSolenoid.Value.kForward);
+			rightArm.set(DoubleSolenoid.Value.kForward);
+    		
+    		if (elevatorR < 10768)
+    		{
+    			canWinch.set(-1);
+    			canWinch2.set(-1);
+    		}
+    		else 
+    		{
+    			canWinch.set(0);
+    			canWinch2.set(0);
+    			gotoSpot=false;
+    		}
+    	}
+    }
+    
+    public void camFullManualE()
+    {
+    	//If cam manual is allowed, use the select button to move it in only one direction
+    	
+    	if(camMode == 2)
+    	{
+    		if(buttonJ1B8 == false)
+    		{
+    			talKicker.set(0);
+    		}
+    	
+    		if(buttonJ1B8 == true)
+    		{
+    			talKicker.set(-1);
+    		}
+
+    	}
+    }
+    
+    public void buttonTogglesE()
+>>>>>>> origin/master
     
 }

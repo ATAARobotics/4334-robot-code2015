@@ -116,6 +116,7 @@ public class Robot extends IterativeRobot
 	double turnRad, speedMultiplier;// Variables for turning radius and overall speed multiplier
 	double deadZ, deadZ2;			// Variables that store deadzones
 	double camSet1, camSet2;		// Variables that decide that setpoints the cam uses
+	double leftRate, rightRate;
 	
     boolean stillPressed;	//Booleans to stop button presses from repeating 20 x per second lol
     boolean stillPressed2;
@@ -193,8 +194,8 @@ public class Robot extends IterativeRobot
     	flipper.set(DoubleSolenoid.Value.kReverse);
     
     	encoderElevator = new Encoder(0, 1, true, EncodingType.k4X);
-    	encoderR = new Encoder(8, 9, true, EncodingType.k4X);
-    	encoderL = new Encoder(6, 7, true, EncodingType.k4X);
+    	encoderR = new Encoder(6, 7, true, EncodingType.k4X);
+    	encoderL = new Encoder(8, 9, true, EncodingType.k4X);
     	encoderL.reset();
     	encoderR.reset();
     	encoderElevator.reset(); 
@@ -329,8 +330,8 @@ public class Robot extends IterativeRobot
     	SmartDashboard.putString(gearPos, gearPos2);
     	SmartDashboard.putNumber("Speed Multiplier", speedMultiplier);
     	SmartDashboard.putNumber("Turn Multiplier", turnRad);
-    	SmartDashboard.putNumber("Cam Out", camSet1); 
-    	SmartDashboard.putNumber("Cam In", camSet2); 
+    	SmartDashboard.putNumber("Left encoder Rate", leftRate);
+    	SmartDashboard.putNumber("Right encoder Rate", rightRate);
     }
     
     public void elevatorLow()
@@ -842,6 +843,8 @@ public class Robot extends IterativeRobot
     	if(joy.getRawButton(7) == true)
     	{
     		encoderElevator.reset();
+    		encoderR.reset();
+    		encoderL.reset();
     	}
     }
 
@@ -853,8 +856,10 @@ public class Robot extends IterativeRobot
     {
     	//Gets the absolute value of the drivetrain encoders
     	
-    	leftR = Math.abs(encoderR.get());
-    	rightR = Math.abs(encoderL.get());
+    	leftR = Math.abs(encoderL.get());
+    	rightR = Math.abs(encoderR.get());
+    	rightRate = encoderR.getRate();
+    	leftRate = encoderL.getRate();
     	
     	//Gets the regular values of everything else
     	
@@ -913,105 +918,6 @@ public class Robot extends IterativeRobot
     	
     }
     
-    public void leftTurn90(double power)
-    {
-    	//Sets the drivetrain motors to the given power to make a right angle turn
-    	
-    	while(rightR < 550)
-    	{
-    		canFL.set(power);
-    		canBL.set(power);
-    		
-    		canBR.set(power);
-    		canFR.set(power);
-    	}
-    	canFL.set(0);
-		canBL.set(0);
-		
-		canBR.set(0);
-		canFR.set(0);
-		
-		encoderL.reset();
-    
-    }
-    
-    public void rightTurn90(double power)
-    {
-    	//Sets the drivetrain motors to the given power to make a right angle turn
-    	
-    	while(rightR < 550)
-    	{
-    		canFL.set(-power);
-    		canBL.set(-power);
-    		
-    		canBR.set(-power);
-    		canFR.set(-power);
-    	}
-    	canFL.set(0);
-		canBL.set(0);
-		
-		canBR.set(0);
-		canFR.set(0);
-		
-		encoderL.reset();
-    }
-    
-    public void leftTurn45(double power)
-    {
-    	//Sets the drivetrain motors to the given power to make a 45 degree turn
-    	
-    	canFL.set(power);
-		canBL.set(power);
-		
-		canBR.set(power);
-		canFR.set(power);
-		
-		//Waits for the given time
-		
-		try {
-			Thread.sleep(353);
-		} catch (InterruptedException e) {
-			
-			Thread.currentThread().interrupt();
-		}
-		
-		//Stops
-    	
-    	canFL.set(0);
-		canBL.set(0);
-		
-		canBR.set(0);
-		canFR.set(0);
-    }
-    
-    public void rightTurn45(double power)
-    {
-    	//Sets the drivetrain motors to the given power to make a 45 degree turn
-    	
-    	canFL.set(-power);
-		canBL.set(-power);
-		
-		canBR.set(-power);
-		canFR.set(-power);
-		
-		//Waits for the given time
-		
-		try {
-			Thread.sleep(353);
-		} catch (InterruptedException e) {
-			
-			Thread.currentThread().interrupt();
-		}
-		
-		//Stops
-    	
-    	canFL.set(0);
-		canBL.set(0);
-		
-		canBR.set(0);
-		canFR.set(0);
-    }
-    
     public void setTurn(double turnDegrees, double power)
     {
     	//Sets the drivetrain motors to the given power to make a right angle turn
@@ -1038,7 +944,7 @@ public class Robot extends IterativeRobot
 		encoderR.reset();
     
     }
-
+    
     public void moveArms(int time, int power)
     {
     	//Moves arms ar given power
@@ -1106,7 +1012,7 @@ public class Robot extends IterativeRobot
     
     public void antiCoast()
     {
-
+    	
     }
     
 //----------------------------------------------------------------------------------------------------------------------------------\\
@@ -1115,7 +1021,7 @@ public class Robot extends IterativeRobot
     
     public void Testing()
     {
-    	elevatorUp();
+    	
     }
     
     public void moveToZoneAuto()
@@ -1165,7 +1071,7 @@ public class Robot extends IterativeRobot
     }
     
     public void threeToteAuto()
-    {
+    { 
     	encoderR.reset();
     	elevatorUp();
     	wait(1100);

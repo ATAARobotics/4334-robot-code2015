@@ -200,7 +200,6 @@ public class Robot extends IterativeRobot
     	encoderR.reset();
     	encoderElevator.reset(); 
     	teleOpOnce = true;
-    	autoMode = 1;
     	speedMultiplier = 1;
     	turnRad = 0.74;
     	goOnce = true;
@@ -607,7 +606,7 @@ public class Robot extends IterativeRobot
     		}	
     }
        
-    public void camSetpoint()
+    public synchronized void camSetpoint()
     {
     	//If cam is in setpoint mode, switch positions using the pot
     	
@@ -852,7 +851,7 @@ public class Robot extends IterativeRobot
    
     //Auto Mode methods
     
-    public void getSensors()
+    public synchronized void getSensors()
     {
     	//Gets the absolute value of the drivetrain encoders
     	
@@ -863,7 +862,7 @@ public class Robot extends IterativeRobot
     	
     	//Gets the regular values of everything else
     	
-    	elevatorR = (-encoderElevator.get());
+    	elevatorR = (encoderElevator.get());
     	potDegrees = pot1.getVoltage();
     	elevatorMin = limit2.get();
     	elevatorMax = limit1.get();
@@ -880,15 +879,20 @@ public class Robot extends IterativeRobot
     	encoderR.reset();
 		encoderL.reset();
     	
-		while(rightR < distance)
+		System.out.println("Drive Start");
+		
+		while(Math.abs(encoderR.getDistance()) < distance)
 		{
 			canFL.set(-power);
 			canBL.set(-power);
 			
 			canBR.set(power);
 			canFR.set(power);
+			
+			System.out.println(encoderR.get());
 		}
-		//Stops
+		
+		System.out.println("Drive Done");
 		
     	canFL.set(0);
 		canBL.set(0);
@@ -925,13 +929,17 @@ public class Robot extends IterativeRobot
     	encoderL.reset();
     	encoderR.reset();
     	
-    	while(rightR < (turnDegrees * (550/90)))
+    	System.out.println("Turn Starts");
+    	
+    	while(Math.abs(encoderR.getDistance()) < (turnDegrees * (550/90)))
     	{
     		canFL.set(power);
     		canBL.set(power);
     		
     		canBR.set(power);
     		canFR.set(power);
+    		
+    		System.out.println(encoderR.get());
     	}
     	
     	canFL.set(0);
@@ -940,6 +948,8 @@ public class Robot extends IterativeRobot
 		canBR.set(0);
 		canFR.set(0);
 		
+		System.out.println("Turn Done");
+		
 		encoderL.reset();
 		encoderR.reset();
     
@@ -947,7 +957,7 @@ public class Robot extends IterativeRobot
     
     public void moveArms(int time, int power)
     {
-    	//Moves arms ar given power
+    	//Moves arms given power
     	
     	talArmLeft.set(-power);
     	talArmRight.set(power);
@@ -965,6 +975,42 @@ public class Robot extends IterativeRobot
     	
     	talArmLeft.set(0);
 		talArmRight.set(0);
+    }
+    
+    public void moveArmswhileDrive(int distance, double power, int powerArms)
+    {
+    	//Moves arms given power
+    	encoderR.reset();
+		encoderL.reset();
+		
+    	talArmLeft.set(-powerArms);
+    	talArmRight.set(powerArms);
+    	
+		while(Math.abs(encoderR.get()) < distance)
+		{
+			canFL.set(-power);
+			canBL.set(-power);
+			
+			canBR.set(power);
+			canFR.set(power);
+			
+			talArmLeft.set(-powerArms);
+	    	talArmRight.set(powerArms);
+		}
+		
+		//Stops
+    	canFL.set(0);
+		canBL.set(0);
+		
+		canBR.set(0);
+		canFR.set(0);
+		
+    	talArmLeft.set(0);
+		talArmRight.set(0);
+		
+		encoderR.reset();
+		encoderL.reset();
+    	
     }
     
     public void stingerOut()
@@ -993,7 +1039,7 @@ public class Robot extends IterativeRobot
 		}
     }
     
-    public void elevatorUp()
+    public synchronized void elevatorUp()
     {
     	gotoSpot = true;
 		gotoCam1 = true;
@@ -1002,18 +1048,20 @@ public class Robot extends IterativeRobot
 	
     }
     
-    public void elevatorDown()
+    public synchronized void elevatorDown()
     {
     	gotoSpot2 = true;
-		gotoCam1 = false;
+    	gotoCam1 = false;
 		gotoCam2 = true;
 		camActivate = true;
     }
     
-    public void antiCoast()
-    {
-    	
+    public synchronized void camIn(){
+    	gotoCam1 = false;
+		gotoCam2 = true;
+		camActivate = true;
     }
+    
     
 //----------------------------------------------------------------------------------------------------------------------------------\\
     
@@ -1072,15 +1120,53 @@ public class Robot extends IterativeRobot
     
     public void threeToteAuto()
     { 
+    		//Start
     	encoderR.reset();
-    	elevatorUp();
+    	elevatorUp();	    	
+    	armsOpen();
     	wait(1100);
-    	setTurn(45, -0.65);
-    	encoderR.reset();
-    	drive(1000, 0.5);
-    	drive(100, -0.5);
-    	setTurn(40, 0.65);
-    	//drive(1000, 0.5);
+    		//Turn 1
+  		setTurn(31, -0.5);
+  		wait(10);
+    		//Drive 1 w/ anti-coast
+  		drive(800, 0.65);
+  		wait(10);
+    	drive(80, -0.65);
+    	wait(10);
+    		//Turn 2
+  	    setTurn(35.955, 0.5);
+    	wait(10);
+    		//Drive 2 w/ arms and FUCKING INTAKE BITCH
+    	moveArmswhileDrive (1200, 0.40, -1);
+   	   	moveArms(500, -1);
+     	armsClose();
+      	moveArms(1000, -1);
+	    wait(10);
+	    	//Tote 2 gets picked up	 
+	    camIn();
+	    wait(1000);
+	    elevatorDown();
+	    wait(3000);
+	    elevatorUp();
+	    wait(1100);
+    		//Turn 3
+	    setTurn(40, -0.65);
+  	   	wait(10);
+    		//Drive 3 w/ anti-coast
+   		drive(800, 0.65);
+       	wait(10);
+   		drive(80, -0.65);
+     	wait(10);
+    		//Turn 4
+    	setTurn(30, 0.65);
+    	wait(10);
+    		//Drive 4 w/ arms and intake
+    	moveArmswhileDrive (1200, 0.40, -1);
+    	moveArms(500, -1);
+       	armsClose();
+       	moveArms(1000, -1);
+        wait(10);
+    		//End
     }
 
     public void binJackerAuto()

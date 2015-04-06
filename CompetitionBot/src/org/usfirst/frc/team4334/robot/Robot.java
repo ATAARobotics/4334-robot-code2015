@@ -119,7 +119,7 @@ public class Robot extends IterativeRobot
 	double leftRate, rightRate;
 	
     boolean stillPressed;	//Booleans to stop button presses from repeating 20 x per second lol
-    boolean stillPressed2;
+    boolean	stillPressed2;
     boolean stillPressed3;
     boolean stillPressed4;
     boolean stillPressed5;
@@ -204,8 +204,8 @@ public class Robot extends IterativeRobot
     	turnRad = 0.74;
     	goOnce = true;
     	
-    	camSet1 = prefs.getDouble("Cam_Out", 2.91);
-    	camSet2 = prefs.getDouble("Cam_In", 2.5);
+    	camSet1 = prefs.getDouble("Cam_In", 2.5);
+    	camSet2 = prefs.getDouble("Cam_Out", 2.91);
     	autoMode = prefs.getInt("Auto_Mode", 0); // Determining which auto mode should be used from the preferences table on SmartDashboard
     }
 
@@ -331,6 +331,9 @@ public class Robot extends IterativeRobot
     	SmartDashboard.putNumber("Turn Multiplier", turnRad);
     	SmartDashboard.putNumber("Left encoder Rate", leftRate);
     	SmartDashboard.putNumber("Right encoder Rate", rightRate);
+    	SmartDashboard.putNumber("Cam In", camSet1);
+    	SmartDashboard.putNumber("Cam Out", camSet2);
+    	SmartDashboard.putNumber("Auto Mode", autoMode);
     }
     
     public void elevatorLow()
@@ -606,7 +609,7 @@ public class Robot extends IterativeRobot
     		}	
     }
        
-    public synchronized void camSetpoint()
+    public void camSetpoint()
     {
     	//If cam is in setpoint mode, switch positions using the pot
     	
@@ -615,7 +618,7 @@ public class Robot extends IterativeRobot
     		if(gotoCam1)
     		{
 
-        		if (potDegrees < 2.91)
+        		if (potDegrees < camSet2)
         		{
         			talKicker.set(-1);
         		}
@@ -630,7 +633,7 @@ public class Robot extends IterativeRobot
     		if(!gotoCam1)
     		{
 
-    			if (potDegrees > 2.5)
+    			if (potDegrees > camSet1)
         		{
         			talKicker.set(1);
         		}
@@ -813,6 +816,8 @@ public class Robot extends IterativeRobot
         	{
         		elevatorManual = true;
         		gotoSpot=false;
+        		gotoSpot2 = false;
+        		gotoSpot3 = false;
         		canWinch.set(-(joy2.getRawAxis(3)));
         		canWinch2.set(-(joy2.getRawAxis(3)));
         	}
@@ -827,6 +832,8 @@ public class Robot extends IterativeRobot
         	{
         		elevatorManual = true;
         		gotoSpot=false;
+        		gotoSpot2 = false;
+        		gotoSpot3 = false;
         		canWinch.set(joy2.getRawAxis(2));
         		canWinch2.set(joy2.getRawAxis(2));
         	}
@@ -851,7 +858,7 @@ public class Robot extends IterativeRobot
    
     //Auto Mode methods
     
-    public synchronized void getSensors()
+    public void getSensors()
     {
     	//Gets the absolute value of the drivetrain encoders
     	
@@ -1085,9 +1092,9 @@ public class Robot extends IterativeRobot
     {
     	armsClose();
     	
-    	setTurn(90, -1);
+    	setTurn(48.5, -1);
     	
-    	drive(1400, 0.5);
+    	drive(1100, 0.5);
     	
     	armsOpen();
     	

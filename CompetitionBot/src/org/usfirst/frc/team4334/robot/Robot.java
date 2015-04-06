@@ -118,21 +118,24 @@ public class Robot extends IterativeRobot
 	double camSet1, camSet2;		// Variables that decide that setpoints the cam uses
 	double leftRate, rightRate;
 	
-    boolean stillPressed;	//Booleans to stop button presses from repeating 20 x per second lol
-    boolean	stillPressed2;
-    boolean stillPressed3;
-    boolean stillPressed4;
-    boolean stillPressed5;
-    boolean stillPressed6;
-    boolean stillPressed7;
-    boolean stillPressed8;
-    boolean stillPressed9;
-    boolean stillPressed10;
-    boolean elevatorMax;	//Booleans for elevator limit switches
-    boolean elevatorMin;
-    boolean elevatorManual;	//Boolean to decide whether manual elevator control is allowed
+    boolean stillPressed,	//Booleans to stop button presses from repeating 20 x per second lol
+    		stillPressed2,
+    		stillPressed3,
+    		stillPressed4,
+    		stillPressed5,
+    		stillPressed6,
+    		stillPressed7,
+    		stillPressed8,
+    		stillPressed9,
+    		stillPressed10,
+    		elevatorMax,	//Booleans for elevator limit switches
+    		elevatorMin,
+    		elevatorManual,	//Boolean to decide whether manual elevator control is allowed
+    		gotoSpot, 
+    		gotoSpot2, 
+    		gotoSpot3, 
+    		gotoSpot4;
     boolean camSetPoint = false;
-	boolean gotoSpot, gotoSpot2, gotoSpot3, gotoSpot4;
 	boolean gotoCam1 = true;
 	boolean gotoCam2 = false;
 	boolean camChange = false;
@@ -177,7 +180,7 @@ public class Robot extends IterativeRobot
     	joy2 = new Joystick(1);
     
     	comp  = new Compressor(0);
-    	comp.setClosedLoopControl(true); // Setting compressor to closed loop control (basically automatic)
+    	comp.setClosedLoopControl(true); // Setting compressor to closed loop control (aka automatic)
     
     	pot1 = new AnalogInput(0);  
     
@@ -206,7 +209,7 @@ public class Robot extends IterativeRobot
     	
     	camSet1 = prefs.getDouble("Cam_In", 2.5);
     	camSet2 = prefs.getDouble("Cam_Out", 2.91);
-    	autoMode = prefs.getInt("Auto_Mode", 0); // Determining which auto mode should be used from the preferences table on SmartDashboard
+    //	autoMode = prefs.getInt("Auto_Mode", 0); // Determining which auto mode should be used from the preferences table on SmartDashboard
     }
 
     
@@ -221,8 +224,11 @@ public class Robot extends IterativeRobot
     
     public void autonomousPeriodic()
     {
+    	smartDashboard();
+    	
     	if(goOnce) // Allows Auto to run only once instead of 20x per second
     	{
+    		autoMode = prefs.getInt("Auto_Mode", 0);
        		elevatorThread2Auto.schedule(new TimerTask(){public void run(){elevatorLow();}}, 20, 20); //Starting Threads for auto
     		elevatorThreadAuto.schedule(new TimerTask(){public void run(){elevatorOneTote();}}, 20, 20);
     		sensorThread.schedule(new TimerTask(){public void run(){getSensors();}}, 20, 20);
@@ -275,6 +281,11 @@ public class Robot extends IterativeRobot
     
      //This function is called periodically [20 ms] during operator control
     
+    public void teleopInit()
+    {
+    	
+    }
+    
 	public void teleopPeriodic() 
     {
 		if(teleOpOnce) // Everything that should only be run once goes in here
@@ -321,8 +332,10 @@ public class Robot extends IterativeRobot
     public void smartDashboard()
     {
     	//Printing info for the smartdashboard
-    	
-    	SmartDashboard.putNumber("Elevator Encoder", elevatorR); 
+
+    	SmartDashboard.putNumber("Left Encoder", leftR);
+    	SmartDashboard.putNumber("Right Encoder", rightR);
+    	SmartDashboard.putNumber("Elevator Encoder", elevatorR);
     	SmartDashboard.putNumber("Cam Potentiometer", potDegrees); 
     	SmartDashboard.putBoolean("High Limit Switch", elevatorMax);   
     	SmartDashboard.putBoolean("Low Limit Switch", elevatorMin);   
@@ -873,12 +886,6 @@ public class Robot extends IterativeRobot
     	potDegrees = pot1.getVoltage();
     	elevatorMin = limit2.get();
     	elevatorMax = limit1.get();
-    	
-    	//Prints them to the smartdashboard
-    	
-    	SmartDashboard.putNumber("Left Encoder", leftR);
-    	SmartDashboard.putNumber("Right Encoder", rightR);
-    	SmartDashboard.putNumber("Elevator Encoder", elevatorR);
     }
     
     public void drive(int distance, double power)

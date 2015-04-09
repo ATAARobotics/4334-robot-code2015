@@ -1,41 +1,46 @@
 package org.usfirst.frc.team4334.robot;
 
+import edu.wpi.first.wpilibj.SpeedController;
+
 public class Elevator {
 	
-	Robot main = new Robot();
-	Cam cam = new Cam();
-	
-	private void GoUp(double speed){
-		main.elevatorMoter.set(-speed);
-		main.elevatorMoter.set(-speed);
+	public Elevator(SpeedController left, SpeedController right)
+	{
+		
 	}
 	
-	private void GoDown(double speed){
-		main.elevatorMoter.set(speed);
-		main.elevatorMoter2.set(speed);
+	private static void GoUp(double speed){
+		
+		Robot.elevatorMoter.set(-speed);
+		Robot.elevatorMoter.set(-speed);
 	}
-	public void manual(){
-		if (main.limit2.get() == false || main.miranda.getRawAxis(2) < 0.01 && main.miranda.getRawAxis(3) < 0.01 || main.miranda.getRawAxis(2) > 0.01 && main.miranda.getRawAxis(3) > 0.01){
-			main.elevatorMoter.set(0);
-			main.elevatorMoter2.set(0);
+	
+	private static void GoDown(double speed){
+		Robot.elevatorMoter.set(speed);
+		Robot.elevatorMoter2.set(speed);
+	}
+	public static void manual(){
+		if (Robot.limit2.get() == false || Robot.miranda.getRawAxis(2) < 0.01 && Robot.miranda.getRawAxis(3) < 0.01 || Robot.miranda.getRawAxis(2) > 0.01 && Robot.miranda.getRawAxis(3) > 0.01){
+			Robot.elevatorMoter.set(0);
+			Robot.elevatorMoter2.set(0);
 		}
 		else{
-			if(main.miranda.getRawAxis(2) > 0.01){
-				GoDown(main.miranda.getRawAxis(2));
+			if(Robot.miranda.getRawAxis(2) > 0.01){
+				GoDown(Robot.miranda.getRawAxis(2));
 			}
-			else if(main.miranda.getRawAxis(3) > 0.01){
-				GoUp(main.miranda.getRawAxis(3));
+			else if(Robot.miranda.getRawAxis(3) > 0.01){
+				GoUp(Robot.miranda.getRawAxis(3));
 			}
 		}
 	}
 	
-	public void GotoSetpoint(int SetPoint){
-		if(main.elevatorR > SetPoint){
+	public static void GotoSetpoint(int SetPoint){
+		if(Robot.elevatorR > SetPoint){
 			GoDown(0.6);
 		}
 		else{
 			GoUp(0.6);
 		}
-		cam.Move(1);
+		Cam.Move(1);
 	}
 }

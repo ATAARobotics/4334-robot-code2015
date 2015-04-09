@@ -64,87 +64,84 @@ public class Robot extends IterativeRobot
     
     //This function is run when the robot is first started up and should be
     //used for any initialization code.
-    
-	Elevator elevator = new Elevator();
-	Cam cam = new Cam();
 	
-    Preferences prefs;
+	public static Preferences prefs;
    
-	Joystick cole;	//Xbox controllers
-	Joystick miranda;
+	public static Joystick cole;	//Xbox controllers
+	public static Joystick miranda;
 	
-	CameraServer camera;
+	public static CameraServer camera;
 	
-	CANTalon canFL; // Talon SRXs
-    CANTalon canBL;
-    CANTalon canFR;
-    CANTalon canBR;
-    CANTalon elevatorMoter;
-    CANTalon elevatorMoter2;
-    Talon talKicker;	//Talon SRs
-    Talon talArmLeft;
-    Talon talArmRight;
+	public static CANTalon canFL; // Talon SRXs
+	public static CANTalon canBL;
+	public static  CANTalon canFR;
+    public static CANTalon canBR;
+    public static CANTalon elevatorMoter;
+    public static CANTalon elevatorMoter2;
+    public static Talon talKicker;	//Talon SRs
+    public static Talon talArmLeft;
+    public static Talon talArmRight;
     
-    Encoder encoderL; //Encoders
-	Encoder encoderR;
-	Encoder encoderElevator;
+    public static Encoder encoderL; //Encoders
+    public static Encoder encoderR;
+    public static Encoder encoderElevator;
 	
-	Timer sensorThreadAuto; 	//Threads
-	Timer elevatorThreadAuto;
-	Timer elevatorThread2Auto;	
-	Timer sensorThread;
-	Timer elevatorThread;
-	Timer elevatorThread2;
-	Timer elevatorThread3;
-	Timer camThreadAuto;
-	Timer camThread;
+    public static Timer sensorThreadAuto; 	//Threads
+    public static Timer elevatorThreadAuto;
+    public static Timer elevatorThread2Auto;	
+    public static Timer sensorThread;
+    public static Timer elevatorThread;
+    public static Timer elevatorThread2;
+    public static Timer elevatorThread3;
+    public static Timer camThreadAuto;
+    public static Timer camThread;
 
-	AnalogInput pot1;		//Potentiometer, Compressor and solenoids
-	Compressor comp;
-    DoubleSolenoid gearShift;
-    DoubleSolenoid leftArm;
-    DoubleSolenoid rightArm;
-    DoubleSolenoid flipper;
+    public static AnalogInput pot1;		//Potentiometer, Compressor and solenoids
+    public static Compressor comp;
+    public static  DoubleSolenoid gearShift;
+    public static DoubleSolenoid leftArm;
+    public static DoubleSolenoid rightArm;
+    public static DoubleSolenoid flipper;
    
-    DigitalInput limit1;	//Limit Switches
-    DigitalInput limit2;
+    public static DigitalInput limit1;	//Limit Switches
+    public static DigitalInput limit2;
     
-    String gearPos, gearPos2; // Strings for the smartdasboard gear positions
+    public static String gearPos, gearPos2; // Strings for the smartdasboard gear positions
     
-    double leftThumb2,rightThumb2; 	// Variables where second Xbox thumbstick values are stored
-    double leftTrig,rightTrig;	   	// Variables where Xbox trigger values are stored
-    double leftTrig2,rightTrig2;	// Variables where second Xbox trigger values are stored
-    double degrees, potDegrees;		// Variables where Potentiometer values are stored
-	double leftThumb,rightThumb;	// Variables where first Xbox thumbstick values are stored
-	double turnRad, speedMultiplier;// Variables for turning radius and overall speed multiplier
-	double deadZ, deadZ2;			// Variables that store deadzones
-	double camSet1, camSet2;		// Variables that decide that setpoints the cam uses
-	double leftRate, rightRate;
+    public static double leftThumb2,rightThumb2; 	// Variables where second Xbox thumbstick values are stored
+    public static double leftTrig,rightTrig;	   	// Variables where Xbox trigger values are stored
+    public static double leftTrig2,rightTrig2;	// Variables where second Xbox trigger values are stored
+    public static double degrees, potDegrees;		// Variables where Potentiometer values are stored
+    public static double leftThumb,rightThumb;	// Variables where first Xbox thumbstick values are stored
+    public static double turnRad, speedMultiplier;// Variables for turning radius and overall speed multiplier
+    public static double deadZ, deadZ2;			// Variables that store deadzones
+    public static double camSet1, camSet2;		// Variables that decide that setpoints the cam uses
+    public static double leftRate, rightRate;
 	
-    boolean stillPressed;	//Booleans to stop button presses from repeating 20 x per second lol
-    boolean stillPressed2;
-    boolean stillPressed3;
-    boolean stillPressed4;
-    boolean stillPressed5;
-    boolean stillPressed6;
-    boolean stillPressed7;
-    boolean stillPressed8;
-    boolean stillPressed9;
-    boolean stillPressed10;
-    boolean elevatorMax;	//Booleans for elevator limit switches
-    boolean elevatorMin;
-    boolean elevatorManual;	//Boolean to decide whether manual elevator control is allowed
-    boolean camSetPoint = false;
-	boolean gotoSpot, gotoSpot2, gotoSpot3, gotoSpot4;
-	boolean gotoCam1 = true;
-	boolean gotoCam2 = false;
-	boolean camChange = false;
-	boolean camActivate = false;
-	boolean goOnce, teleOpOnce; // Variables to allow auto and certain teleop funtions to run only once
+    public static boolean stillPressed;	//Booleans to stop button presses from repeating 20 x per second lol
+    public static boolean stillPressed2;
+    public static boolean stillPressed3;
+    public static boolean stillPressed4;
+    public static boolean stillPressed5;
+    public static boolean stillPressed6;
+    public static boolean stillPressed7;
+    public static boolean stillPressed8;
+    public static boolean stillPressed9;
+    public static boolean stillPressed10;
+    public static boolean elevatorMax;	//Booleans for elevator limit switches
+    public static boolean elevatorMin;
+    public static boolean elevatorManual;	//Boolean to decide whether manual elevator control is allowed
+    public static boolean camSetPoint = false;
+    public static boolean gotoSpot, gotoSpot2, gotoSpot3, gotoSpot4;
+    public static boolean gotoCam1 = true;
+    public static boolean gotoCam2 = false;
+    public static boolean camChange = false;
+    public static boolean camActivate = false;
+    public static boolean goOnce, teleOpOnce; // Variables to allow auto and certain teleop funtions to run only once
 	
-	int camMode;	// Decide whether cam should use setpoint or manual mode
-	public int leftR, rightR, elevatorR;	// Variables that store encoder values. "R" means rotations not "right".
-	int autoMode;	// Variable that decides which auto to use
+    public static int camMode;	// Decide whether cam should use setpoint or manual mode
+    public static int leftR, rightR, elevatorR;	// Variables that store encoder values. "R" means rotations not "right".
+	public static int autoMode;	// Variable that decides which auto to use
 	
     public void robotInit()
     {
@@ -299,7 +296,7 @@ public class Robot extends IterativeRobot
     	
     	armMotors();
     	
-    	elevator.manual();
+    	Elevator.manual();
     	
     	buttonToggles();
     	
@@ -319,8 +316,8 @@ public class Robot extends IterativeRobot
     }
 
      //This function is called periodically during test mode
-     
-    public void testPeriodic() 
+
+	public void testPeriodic() 
     {
     	
     }

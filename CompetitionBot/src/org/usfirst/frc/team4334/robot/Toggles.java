@@ -4,130 +4,128 @@ import edu.wpi.first.wpilibj.DoubleSolenoid;
 
 public class Toggles {
 	
-	Robot main = new Robot();
+	static boolean stillPressed3;
+	static boolean stillPressed1;
+	static boolean stillPressed6;
+	static boolean stillPressed2;
+	static boolean stillPressed5;
+    static boolean stillPressed;
 	
-	boolean stillPressed3;
-	boolean stillPressed1;
-	boolean stillPressed6;
-	boolean stillPressed2;
-	boolean stillPressed5;
-    boolean stillPressed;
-	
-	public void SpeedToggle(){
-		if (main.cole.getRawButton(3) == false) {stillPressed3 = false;}
+	public static void SpeedToggle(){
+		if (Robot.cole.getRawButton(3) == false) {stillPressed3 = false;}
     	
-		if (main.cole.getRawButton(3) && (stillPressed3 == false))
+		if (Robot.cole.getRawButton(3) && (stillPressed3 == false))
 		{
-			if (main.speedMultiplier == 1)
+			if (Robot.speedMultiplier == 1)
 			{
-				main.speedMultiplier = 0.4;
-				main.turnRad = 1.8;
+				Robot.speedMultiplier = 0.4;
+				Robot.turnRad = 1.8;
 				stillPressed3 = true;
 			}
-			else if (main.speedMultiplier == 0.4)
+			else if (Robot.speedMultiplier == 0.4)
 			{
-				main.speedMultiplier = 1;
-    			main.turnRad = 0.74;
+				Robot.speedMultiplier = 1;
+    			Robot.turnRad = 0.74;
     			stillPressed3 = true;
 			}		
 		}
 	}
 	
-	public void GearPrint(){
-		if(main.gearShift.get() == DoubleSolenoid.Value.kForward)
+	public static void GearPrint(){
+		if(Robot.gearShift.get() == DoubleSolenoid.Value.kForward)
     	{
-    		main.gearPos2 = "High Gear";
+    		Robot.gearPos2 = "High Gear";
     	}
-		else if(main.gearShift.get() == DoubleSolenoid.Value.kReverse)
+		else if(Robot.gearShift.get() == DoubleSolenoid.Value.kReverse)
     	{
-    		main.gearPos2 = "Low Gear";
+    		Robot.gearPos2 = "Low Gear";
     	}
 	}
 	
-	public void CamSetToggle(){
-		if (main.miranda.getRawButton(1) == false) {stillPressed1 = false;}
+	public static void CamSetToggle(){
+		if (Robot.miranda.getRawButton(1) == false) {stillPressed1 = false;}
     	
-    	if (main.miranda.getRawButton(1) && (stillPressed1 == false))
+    	if (Robot.miranda.getRawButton(1) && (stillPressed1 == false))
     	{
-    		if (main.gotoCam1)
+    		if (Robot.gotoCam1)
 			{
-				main.gotoCam1 = false;
+				Robot.gotoCam1 = false;
 				
 			}
-    		else if (!main.gotoCam1)
+    		else if (!Robot.gotoCam1)
     		{
-    			main.gotoCam1 = true;
+    			Robot.gotoCam1 = true;
     		}
     		
-    		main.camActivate = true;
+    		Robot.camActivate = true;
     		stillPressed1 = true;
     	}
 	}
 	
-	public void CamModeToggle(){
-		if (main.miranda.getRawButton(6) == false) {stillPressed6 = false;}
-		if (main.miranda.getRawButton(6) && (stillPressed6 == false))
+	public static void CamModeToggle(){
+		if (Robot.miranda.getRawButton(6) == false) {stillPressed6 = false;}
+		if (Robot.miranda.getRawButton(6) && (stillPressed6 == false))
     	{
-    		if (main.camMode == 1)
+    		if (Robot.camMode == 1)
     			{
-    				main.camMode = 2;
+    				Robot.camMode = 2;
     			}
-    		else if(main.camMode == 2)
+    		else if(Robot.camMode == 2)
     		{
-    			main.camMode = 1;
+    			Robot.camMode = 1;
     		}
     	}
 		stillPressed6 = true;
 	}
 	
-	public void GearShift(){
-		if (main.cole.getRawButton(2) == false) {stillPressed2 = false;}
-		if (main.cole.getRawButton(2))
+	public static void GearShift(){
+		if (Robot.cole.getRawButton(2) == false) {stillPressed2 = false;}
+		if (Robot.cole.getRawButton(2))
     	{	
-    		if (main.gearShift.get() == DoubleSolenoid.Value.kForward)
+    		if (Robot.gearShift.get() == DoubleSolenoid.Value.kForward)
     			{
-    			main.gearShift.set(DoubleSolenoid.Value.kReverse);  		
+    			Robot.gearShift.set(DoubleSolenoid.Value.kReverse);  		
     			stillPressed2=true;
     			}
     		else
     		{
-    			main.gearShift.set(DoubleSolenoid.Value.kForward);
+    			Robot.gearShift.set(DoubleSolenoid.Value.kForward);
     			stillPressed2=true;
     		}
     	}
 	}
 	
-	public void ArmToggle(){
-		if (main.cole.getRawButton(5) == false && main.miranda.getRawButton(5) == false) {stillPressed5 = false;}
-		if (main.miranda.getRawButton(5) && main.stillPressed5 == false|| main.cole.getRawButton(5) && stillPressed5 == false)
+	public static void ArmToggle(){
+		if (Robot.cole.getRawButton(5) == false && Robot.miranda.getRawButton(5) == false) {stillPressed5 = false;}
+		if (Robot.miranda.getRawButton(5) && Robot.stillPressed5 == false|| Robot.cole.getRawButton(5) && stillPressed5 == false)
     	{
-    		if ((main.leftArm.get() == DoubleSolenoid.Value.kForward) && (main.rightArm.get() == DoubleSolenoid.Value.kForward))
+    		if ((Robot.leftArm.get() == DoubleSolenoid.Value.kForward) && (Robot.rightArm.get() == DoubleSolenoid.Value.kForward))
    			{
-   				main.leftArm.set(DoubleSolenoid.Value.kReverse);  
-   				main.rightArm.set(DoubleSolenoid.Value.kReverse);
+   				Robot.leftArm.set(DoubleSolenoid.Value.kReverse);  
+   				Robot.rightArm.set(DoubleSolenoid.Value.kReverse);
    				stillPressed5=true;
    			}
     		else 
     		{
-    			main.leftArm.set(DoubleSolenoid.Value.kForward);
-    			main.rightArm.set(DoubleSolenoid.Value.kForward);
+    			Robot.leftArm.set(DoubleSolenoid.Value.kForward);
+    			Robot.rightArm.set(DoubleSolenoid.Value.kForward);
     			stillPressed5=true;
     		}
     	}
 	}
-	public void StingerToggle(){
-		if (main.cole.getRawButton(1) == false) {stillPressed = false;}
+	public static void StingerToggle(){
+		if (Robot.cole.getRawButton(1) == false) {stillPressed = false;}
 		
-		if (main.cole.getRawButton(1) && (stillPressed == false))
+		if (Robot.cole.getRawButton(1) && (stillPressed == false))
 		{
-			if (main.flipper.get() == DoubleSolenoid.Value.kForward)
+			if (Robot.flipper.get() == DoubleSolenoid.Value.kForward)
 			{
-				main.flipper.set(DoubleSolenoid.Value.kReverse);  		
+				Robot.flipper.set(DoubleSolenoid.Value.kReverse);  		
 				stillPressed=true;
 			}
 			else
 			{
-				main.flipper.set(DoubleSolenoid.Value.kForward);
+				Robot.flipper.set(DoubleSolenoid.Value.kForward);
 				stillPressed=true;
 			}
 		}	

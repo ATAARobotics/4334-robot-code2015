@@ -52,7 +52,6 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Preferences;
 import edu.wpi.first.wpilibj.Talon;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.PIDController;
 
 /**
  * This is the official code for ATA's 2015 robot: "Elevation".
@@ -71,17 +70,14 @@ public class Robot extends IterativeRobot
 	public static Joystick cole;	//Xbox controllers
 	public static Joystick miranda;
 	
-	//public static CameraServer camera;
+	public static CameraServer camera;
 	
-	// Talon SRXs
-	
-	PIDController camPID;
-	
-	PIDController FLpid;
-	PIDController FRpid;
-	PIDController BLpid;
-	PIDController BRpid;
-	
+	public static CANTalon canFL; // Talon SRXs
+	public static CANTalon canBL;
+	public static  CANTalon canFR;
+    public static CANTalon canBR;
+    public static CANTalon elevatorMoter;
+    public static CANTalon elevatorMoter2;
     public static Talon talKicker;	//Talon SRs
     public static Talon talArmLeft;
     public static Talon talArmRight;
@@ -102,7 +98,7 @@ public class Robot extends IterativeRobot
 
     public static AnalogInput pot1;		//Potentiometer, Compressor and solenoids
     public static Compressor comp;
-    public static DoubleSolenoid gearShift;
+    public static  DoubleSolenoid gearShift;
     public static DoubleSolenoid leftArm;
     public static DoubleSolenoid rightArm;
     public static DoubleSolenoid flipper;
@@ -112,17 +108,26 @@ public class Robot extends IterativeRobot
     
     public static String gearPos, gearPos2; // Strings for the smartdasboard gear positions
     
-    //public static double leftThumb2,rightThumb2; 	   // Variables where second Xbox thumbstick values are stored
-    //public static double leftTrig,rightTrig;	      // Variables where Xbox trigger values are stored
-    //public static double leftTrig2,rightTrig2;	     // Variables where second Xbox trigger values are stored
+    public static double leftThumb2,rightThumb2; 	// Variables where second Xbox thumbstick values are stored
+    public static double leftTrig,rightTrig;	   	// Variables where Xbox trigger values are stored
+    public static double leftTrig2,rightTrig2;	// Variables where second Xbox trigger values are stored
     public static double degrees, potDegrees;		// Variables where Potentiometer values are stored
-    //public static double leftThumb,rightThumb;	   // Variables where first Xbox thumbstick values are stored
+    public static double leftThumb,rightThumb;	// Variables where first Xbox thumbstick values are stored
     public static double turnRad, speedMultiplier;// Variables for turning radius and overall speed multiplier
-   // public static double camSet1, camSet2;		 // Variables that decide that setpoints the cam uses
+    public static double deadZ, deadZ2;			// Variables that store deadzones
+    public static double camSet1, camSet2;		// Variables that decide that setpoints the cam uses
     public static double leftRate, rightRate;
 	
-    public static boolean stillPressed;
-    
+    public static boolean stillPressed;	//Booleans to stop button presses from repeating 20 x per second lol
+    public static boolean stillPressed2;
+    public static boolean stillPressed3;
+    public static boolean stillPressed4;
+    public static boolean stillPressed5;
+    public static boolean stillPressed6;
+    public static boolean stillPressed7;
+    public static boolean stillPressed8;
+    public static boolean stillPressed9;
+    public static boolean stillPressed10;
     public static boolean elevatorMax;	//Booleans for elevator limit switches
     public static boolean elevatorMin;
     public static boolean elevatorManual;	//Boolean to decide whether manual elevator control is allowed
@@ -142,23 +147,17 @@ public class Robot extends IterativeRobot
     {
     	
     	prefs = Preferences.getInstance();
-   
+   	
+    	canFL = new CANTalon(1); // Declaring shit
+    	canBL = new CANTalon(2);
+    	canFR = new CANTalon(5);
+    	canBR = new CANTalon(6);
+    	elevatorMoter = new CANTalon(3);
+    	elevatorMoter2 = new CANTalon(4);
     	talKicker = new Talon(0);
     	talArmLeft = new Talon(1);
     	talArmRight = new Talon(2);
-    	
-    	CANTalon canFL = new CANTalon(1); 
-    	CANTalon canBL = new CANTalon(2);
-    	CANTalon canFR = new CANTalon(5);
-        CANTalon canBR = new CANTalon(6);
     
-    	camPID = new PIDController(-8, 0, -1, pot1, talKicker);
-    	FLpid = new PIDController(0, 0, 0, encoderL, canFL);
-    	FRpid = new PIDController(0, 0, 0, encoderL, canFR);
-    	BLpid = new PIDController(0, 0, 0, encoderL, canBL);
-    	BRpid = new PIDController(0, 0, 0, encoderL, canBR);
-    	
-    	
     	sensorThread = new Timer();
     	elevatorThread = new Timer();
     	elevatorThread2 = new Timer();
@@ -206,8 +205,8 @@ public class Robot extends IterativeRobot
     	turnRad = 0.74;
     	goOnce = true;
     	
-    	//camSet1 = prefs.getDouble("Cam_Out", 2.91);
-    	//camSet2 = prefs.getDouble("Cam_In", 2.5);
+    	camSet1 = prefs.getDouble("Cam_Out", 2.91);
+    	camSet2 = prefs.getDouble("Cam_In", 2.5);
     	autoMode = prefs.getInt("Auto_Mode", 0); // Determining which auto mode should be used from the preferences table on SmartDashboard
     }
 
@@ -232,38 +231,45 @@ public class Robot extends IterativeRobot
     		
     		if(autoMode == 0)
     		{
+    			goOnce = false;
     			nothingAuto();
     		}
+    		
     		if(autoMode == 1)
-    		{	
+    		{
+    			goOnce = false;
     			moveToZoneAuto();
     		}
     		
     		if(autoMode == 2)
-    		{	
+    		{
+    			goOnce = false;
     			oneToteAuto();
     		}
     		
     		if(autoMode == 3)
-    		{	
+    		{
+    			goOnce = false;
     			oneBinAuto();
     		}
     		
     		if(autoMode == 4)
-    		{	
+    		{
+    			goOnce = false;
     			Testing();
     		}
     		
     		if(autoMode == 6)
-    		{	
+    		{
+    			goOnce = false;
     			binJackerAuto();     
     		}
     		
     		if(autoMode == 7)
-    		{	
+    		{
+    			goOnce = false;
     			threeToteAuto();
     		}
-    		goOnce = false;
     	}
     }
 
@@ -278,19 +284,6 @@ public class Robot extends IterativeRobot
 			elevatorThread2.schedule(new TimerTask(){public void run(){elevatorLow();}}, 20, 20);
 			elevatorThread3.schedule(new TimerTask(){public void run(){elevatorALittleUp();}}, 20, 20);
 			sensorThread.schedule(new TimerTask(){public void run(){getSensors();}}, 20, 20);
-			
-			camPID.enable();
-			camPID.setSetpoint(2.5);
-			
-			camPID.setSetpoint(2.91);
-			
-			FLpid.enable();
-			FRpid.enable();
-			BLpid.enable();
-			BRpid.enable();
-			setDrivePID(1000);
-			
-			
 		
 			teleOpOnce = false; // Ending if statement so it only runs once
 		}
@@ -303,7 +296,7 @@ public class Robot extends IterativeRobot
     	
     	armMotors();
     	
-    	manual();
+    	Elevator.manual();
     	
     	buttonToggles();
     	
@@ -336,7 +329,6 @@ public class Robot extends IterativeRobot
     public void smartDashboard()
     {
     	//Printing info for the smartdashboard
-    	Toggles.GearPrint();
     	
     	SmartDashboard.putNumber("Elevator Encoder", elevatorR); 
     	SmartDashboard.putNumber("Cam Potentiometer", potDegrees); 
@@ -351,12 +343,65 @@ public class Robot extends IterativeRobot
     
     public void elevatorLow()
     {
-    	Elevator.GotoSetpoint(1400);
+    	if (miranda.getRawButton(3) == false) {stillPressed7 = false;}
+    	
+    	if (miranda.getRawButton(3) && (stillPressed7 == false))
+    	{
+    		gotoSpot2 = true;
+    		gotoCam1 = false;
+			gotoCam2 = true;
+    		camActivate = true;
+    		stillPressed7 = true;
+
+    		leftArm.set(DoubleSolenoid.Value.kForward);
+			rightArm.set(DoubleSolenoid.Value.kForward);
+    		
+    		if ((elevatorMin) && (elevatorR >= 1400))
+    		{
+    			elevatorMoter.set(0.6);
+    			elevatorMoter2.set(0.6);
+    		}
+    		
+    		else if((elevatorMin) && (elevatorR < 1400))
+    		{
+    			elevatorMoter.set(0.2);
+    			elevatorMoter2.set(0.2);
+    		}
+    		
+    		else 
+    		{
+    			elevatorMoter.set(0);
+    			elevatorMoter2.set(0);
+    			gotoSpot2=false;
+   			}
+    	}
     }
     
     public void elevatorALittleUp()
     {
-    	Elevator.GotoSetpoint(1500);
+    	if (miranda.getRawButton(2) == false) {stillPressed9 = false;}
+    	
+    	if (miranda.getRawButton(2) && (stillPressed9 == false))
+    	{
+    		gotoSpot3 = true;
+    		stillPressed9 = true;
+    	}
+    	
+    	if (gotoSpot3)
+    	{
+    		if (elevatorR < 1500)
+    		{
+    			elevatorMoter.set(-0.55);
+    			elevatorMoter2.set(-0.55);
+    		}
+    		
+    		else 
+    		{
+    			elevatorMoter.set(0);
+    			elevatorMoter2.set(0);
+    			gotoSpot3=false;
+    		}
+    	}
     }
     
     public void elevatorHigh()
@@ -366,71 +411,44 @@ public class Robot extends IterativeRobot
     
     public void elevatorOneTote()
     {
-    	if (miranda.getRawButton(4) == false) {stillPressed = false;}
+    	if (miranda.getRawButton(4) == false) {stillPressed6 = false;}
     	
-    	if (miranda.getRawButton(4) && (stillPressed == false))
+    	if (miranda.getRawButton(4) && (stillPressed6 == false))
     	{
     		gotoSpot = true;
     		gotoCam1 = true;
 			gotoCam2 = false;
     		camActivate = true;
-    		stillPressed = true;
+    		stillPressed6 = true;
+    		
+    	}
+    	
+    	if (gotoSpot)
+    	{
     
     		leftArm.set(DoubleSolenoid.Value.kForward);
 			rightArm.set(DoubleSolenoid.Value.kForward);
     		
-			Elevator.GotoSetpoint(10768);
+    		if ((elevatorR < 10768) && (elevatorMax))
+    		{
+    			elevatorMoter.set(-1);
+    			elevatorMoter2.set(-1);
+    		}
+    		else 
+    		{
+    			elevatorMoter.set(0);
+    			elevatorMoter2.set(0);
+    			gotoSpot=false;
+    		}
     	}
     }
     
     public void camFullManual()
     {
     	//If cam manual is allowed, use the select button to move it in only one direction
-    	Cam.Manual();
     }
     
     public void buttonToggles(){
-    	if(cole.getRawButton(3) == true){
-    		Toggles.SpeedToggle();
-    	}
-    	else{
-    		Toggles.stillPressed3 = false;
-    	}
-    	
-    	if(miranda.getRawButton(1) == true){
-    		Toggles.CamSetToggle();
-    	}
-    	else{
-    		Toggles.stillPressed1 = false;
-    	}
-    	
-    	if(miranda.getRawButton(6)){
-    		Toggles.CamModeToggle();
-    	}
-    	else{
-    		Toggles.stillPressed6 = false;
-    	}
-    	
-    	if(cole.getRawButton(2) == true){
-    		Toggles.GearShift();
-    	}
-    	else{
-    		Toggles.stillPressed2 = false;
-    	}
-    	
-    	if(cole.getRawButton(5) == true || miranda.getRawButton(5)){
-    		Toggles.ArmToggle();
-    	}
-    	else{
-    		Toggles.stillPressed5 = false;
-    	}
-    	
-    	if(cole.getRawButton(1) == true){
-    		Toggles.StingerToggle();
-    	}
-    	else{
-    		Toggles.stillPressed = false;
-    	}
     }
        
     public void camSetpoint()
@@ -439,28 +457,122 @@ public class Robot extends IterativeRobot
     	
     	if ((camActivate) && (camMode == 1))
     	{
-    		Cam.Auto(gotoCam1);
-    	}	
+    	if(gotoCam1)
+    		{
+
+        		if (potDegrees < 2.91)
+        		{
+        			talKicker.set(-1);
+        		}
+     
+        		else 
+        		{
+        			talKicker.set(0);
+        			camActivate=false;
+        		}
+    		}
+    		
+    		else if(!gotoCam1)
+    		{
+
+    			if (potDegrees > 2.5)
+        		{
+        			talKicker.set(1);
+        		}
+        		
+        		else 
+        		{
+        			talKicker.set(0);
+        			camActivate=false;
+        		}
+    		}
+    		
+    	}
     }
     
     public void arcadeDrive()
     {
-    	if(cole.getRawAxis(1)!= cole.getRawAxis(4)){
-    		Drive.drive();
+    	//Assign the xbox values to variables
+    	
+    	rightThumb = cole.getRawAxis(4);
+    	
+    	leftThumb = -(cole.getRawAxis(1));
+    	
+    	//Define the speed multiplier, deadzones and turning radius multiplier
+     	
+    	deadZ = 0.25;
+    	
+    	//If left thumbstick is still
+    	
+    	if((leftThumb < deadZ) && (leftThumb > -deadZ))
+    	{
+    		canFL.set(((-(rightThumb * turnRad))) * speedMultiplier);
+    		canBL.set(((-(rightThumb * turnRad))) * speedMultiplier);
+    		
+    		canBR.set(((-(rightThumb * turnRad))) * speedMultiplier);
+    		canFR.set(((-(rightThumb * turnRad))) * speedMultiplier);
     	}
+    	
+    	//If right thumbstick is still
+    	
+    	if((rightThumb < deadZ) && (rightThumb > -deadZ))
+    	{
+    		canFL.set(((-leftThumb)) * speedMultiplier);
+    		canBL.set(((-leftThumb)) * speedMultiplier);
+    		
+    		canBR.set(((leftThumb)) * speedMultiplier);
+    		canFR.set(((leftThumb)) * speedMultiplier);
+    	}
+    	
+    	//If both thumbsticks are positive
+    	
+    	if((leftThumb > deadZ) && (rightThumb > deadZ))
+    	{
+    		canFL.set(((-leftThumb)) * speedMultiplier);
+    		canBL.set(((-leftThumb)) * speedMultiplier);
+    		
+    		canBR.set(((leftThumb - (rightThumb * turnRad))) * speedMultiplier);
+    		canFR.set(((leftThumb - (rightThumb * turnRad))) * speedMultiplier);
+    	}
+    	
+    	//If left thumbstick is positive and right thumbstick is negative
+    	
+    	if((leftThumb > deadZ) && (rightThumb < -deadZ))
+    	{
+    		canFL.set(((-(leftThumb + (rightThumb * turnRad)))) * speedMultiplier);
+    		canBL.set(((-(leftThumb + (rightThumb * turnRad)))) * speedMultiplier);
+		
+    		canBR.set(((leftThumb)) * speedMultiplier);
+    		canFR.set(((leftThumb)) * speedMultiplier);
+    	}
+    	
+    	//If left thumbstick is negative and right thumbstick is positive
+    	
+    	if((leftThumb < -deadZ) && (rightThumb > deadZ))
+    	{
+    		canFL.set(((-(leftThumb + (rightThumb * turnRad)))) * speedMultiplier);
+    		canBL.set(((-(leftThumb + (rightThumb * turnRad)))) * speedMultiplier);
+    		
+    		canBR.set(((leftThumb)) * speedMultiplier);
+    		canFR.set(((leftThumb)) * speedMultiplier);
+    	}
+    	
+    	//If left thumbstick is negative and right thumbstick is negative
+    	
+    	if((leftThumb < -deadZ) && (rightThumb < -deadZ))
+    	{
+    		canFL.set(((-leftThumb)) * speedMultiplier);
+    		canBL.set(((-leftThumb)) * speedMultiplier);
+    		
+    		canBR.set(((leftThumb - (rightThumb * turnRad))) * speedMultiplier);
+    		canFR.set(((leftThumb - (rightThumb * turnRad))) * speedMultiplier);
+    	}
+
     }
        
-    public void manual(){
-    	if(elevatorMax && elevatorMin){
-    		Elevator.manual();
-    	}
-    }
-    
     public void armMotors()
     {
-    	if(miranda.getRawAxis(1)!= miranda.getRawAxis(4)){
-    		Drive.drive();
-    	}
+    	
     }
        
 
@@ -499,19 +611,19 @@ public class Robot extends IterativeRobot
     	
 		while(rightR < distance)
 		{
-			Drive.canFL.set(-power);
-			Drive.canBL.set(-power);
+			canFL.set(-power);
+			canBL.set(-power);
 			
-			Drive.canBR.set(power);
-			Drive.canFR.set(power);
+			canBR.set(power);
+			canFR.set(power);
 		}
 		//Stops
 		
-    	Drive.canFL.set(0);
-		Drive.canBL.set(0);
+    	canFL.set(0);
+		canBL.set(0);
 		
-		Drive.canBR.set(0);
-		Drive.canFR.set(0);
+		canBR.set(0);
+		canFR.set(0);
 		
 		encoderR.reset();
 		encoderL.reset();
@@ -544,18 +656,18 @@ public class Robot extends IterativeRobot
     	
     	while(rightR < (turnDegrees * (550/90)))
     	{
-    		Drive.canFL.set(power);
-    		Drive.canBL.set(power);
+    		canFL.set(power);
+    		canBL.set(power);
     		
-    		Drive.canBR.set(power);
-    		Drive.canFR.set(power);
+    		canBR.set(power);
+    		canFR.set(power);
     	}
     	
-    	Drive.canFL.set(0);
-		Drive.canBL.set(0);
+    	canFL.set(0);
+		canBL.set(0);
 		
-		Drive.canBR.set(0);
-		Drive.canFR.set(0);
+		canBR.set(0);
+		canFR.set(0);
 		
 		encoderL.reset();
 		encoderR.reset();
@@ -627,11 +739,9 @@ public class Robot extends IterativeRobot
 		camActivate = true;
     }
     
-    public void setDrivePID(int target){
-    	FLpid.setSetpoint(target);
-    	FRpid.setSetpoint(target);
-    	BLpid.setSetpoint(target);
-    	BRpid.setSetpoint(target);
+    public void antiCoast()
+    {
+    	
     }
     
 //----------------------------------------------------------------------------------------------------------------------------------\\

@@ -12,6 +12,8 @@ public class Toggles {
     static boolean stillPressed;
 	
 	public static void SpeedToggle(){
+		if (Robot.cole.getRawButton(3) == false) {stillPressed3 = false;}
+    	
 		if (Robot.cole.getRawButton(3) && (stillPressed3 == false))
 		{
 			if (Robot.speedMultiplier == 1)
@@ -61,7 +63,7 @@ public class Toggles {
 	}
 	
 	public static void CamModeToggle(){
-
+		if (Robot.miranda.getRawButton(6) == false) {stillPressed6 = false;}
 		if (Robot.miranda.getRawButton(6) && (stillPressed6 == false))
     	{
     		if (Robot.camMode == 1)
@@ -77,7 +79,8 @@ public class Toggles {
 	}
 	
 	public static void GearShift(){
-		if (Robot.cole.getRawButton(2) && stillPressed2)
+		if (Robot.cole.getRawButton(2) == false) {stillPressed2 = false;}
+		if (Robot.cole.getRawButton(2))
     	{	
     		if (Robot.gearShift.get() == DoubleSolenoid.Value.kForward)
     			{
@@ -93,7 +96,8 @@ public class Toggles {
 	}
 	
 	public static void ArmToggle(){
-		if (Robot.miranda.getRawButton(5) && stillPressed5 == false|| Robot.cole.getRawButton(5) && stillPressed5 == false)
+		if (Robot.cole.getRawButton(5) == false && Robot.miranda.getRawButton(5) == false) {stillPressed5 = false;}
+		if (Robot.miranda.getRawButton(5) && Robot.stillPressed5 == false|| Robot.cole.getRawButton(5) && stillPressed5 == false)
     	{
     		if ((Robot.leftArm.get() == DoubleSolenoid.Value.kForward) && (Robot.rightArm.get() == DoubleSolenoid.Value.kForward))
    			{
@@ -109,7 +113,6 @@ public class Toggles {
     		}
     	}
 	}
-	
 	public static void StingerToggle(){
 		if (Robot.cole.getRawButton(1) == false) {stillPressed = false;}
 		

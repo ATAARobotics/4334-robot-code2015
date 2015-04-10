@@ -1,28 +1,28 @@
 package org.usfirst.frc.team4334.robot;
 
-import edu.wpi.first.wpilibj.CANTalon;
+import edu.wpi.first.wpilibj.SpeedController;
 
 public class Elevator {
 	
-    public static CANTalon elevatorMoter = new CANTalon(3);
-    public static CANTalon elevatorMoter2 = new CANTalon(4);
+	public Elevator(SpeedController left, SpeedController right)
+	{
+		
+	}
 	
-    private static void Move(double speed){
-    	elevatorMoter.set(speed);
-		elevatorMoter2.set(speed);
-    }
-    
 	private static void GoUp(double speed){
-		Move(-speed);
+		
+		Robot.elevatorMoter.set(-speed);
+		Robot.elevatorMoter.set(-speed);
 	}
 	
 	private static void GoDown(double speed){
-		Move(speed);
+		Robot.elevatorMoter.set(speed);
+		Robot.elevatorMoter2.set(speed);
 	}
-	
 	public static void manual(){
 		if (Robot.limit2.get() == false || Robot.miranda.getRawAxis(2) < 0.01 && Robot.miranda.getRawAxis(3) < 0.01 || Robot.miranda.getRawAxis(2) > 0.01 && Robot.miranda.getRawAxis(3) > 0.01){
-			Move(0);
+			Robot.elevatorMoter.set(0);
+			Robot.elevatorMoter2.set(0);
 		}
 		else{
 			if(Robot.miranda.getRawAxis(2) > 0.01){
@@ -35,15 +35,12 @@ public class Elevator {
 	}
 	
 	public static void GotoSetpoint(int SetPoint){
-		if(Robot.elevatorR > SetPoint && Robot.elevatorMax == true && Robot.elevatorMin == true){
+		if(Robot.elevatorR > SetPoint){
 			GoDown(0.6);
 		}
-		else if(Robot.elevatorR > SetPoint && Robot.elevatorMax == true && Robot.elevatorMin == true){
+		else{
 			GoUp(0.6);
 		}
-		else{
-			Move(0);
-		}
-		Cam.Auto(true);
+		Cam.Move(1);
 	}
 }

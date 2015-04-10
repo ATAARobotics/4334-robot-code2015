@@ -2,15 +2,15 @@ package org.usfirst.frc.team4334.robot;
 
 public class Cam {
 
-	public static void Auto(boolean mode){
-		if(mode){
+	public static void Move(int mode){
+		if(mode == 1){
 			while(Robot.potDegrees < 2.91){
 				Robot.talKicker.set(-1);
 			}
 			Robot.talKicker.set(0);
 			}
 		
-		else{
+		else if(mode == 2){
 			while(Robot.potDegrees < 2.5){
 				Robot.talKicker.set(-1);
 			}
@@ -19,7 +19,7 @@ public class Cam {
 		}
 	
 	
-	public static void Manual(){
+	public static void manual(){
 		if(Robot.camMode == 2)
     	{
     		if(Robot.cole.getRawButton(8) == false)

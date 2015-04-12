@@ -19,9 +19,7 @@ public class Cam {
 		}
 	
 	
-	public static void Manual(){
-		if(Robot.camMode == 2)
-    	{
+	public static void Manual(){	
     		if(Robot.cole.getRawButton(8) == false)
     		{
     			Robot.talKicker.set(0);
@@ -31,6 +29,5 @@ public class Cam {
     		{
     			Robot.talKicker.set(-1);
     		}
-    	}
 	}
 }

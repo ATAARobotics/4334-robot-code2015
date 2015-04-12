@@ -1,5 +1,5 @@
 /**
- * 		BINDS: 
+   * 		BINDS: 
  * 		
  * 		Joystick 1:
  * 
@@ -112,13 +112,9 @@ public class Robot extends IterativeRobot
     
     public static String gearPos, gearPos2; // Strings for the smartdasboard gear positions
     
-    //public static double leftThumb2,rightThumb2; 	   // Variables where second Xbox thumbstick values are stored
-    //public static double leftTrig,rightTrig;	      // Variables where Xbox trigger values are stored
-    //public static double leftTrig2,rightTrig2;	     // Variables where second Xbox trigger values are stored
+    
     public static double degrees, potDegrees;		// Variables where Potentiometer values are stored
-    //public static double leftThumb,rightThumb;	   // Variables where first Xbox thumbstick values are stored
-    public static double turnRad, speedMultiplier;// Variables for turning radius and overall speed multiplier
-   // public static double camSet1, camSet2;		 // Variables that decide that setpoints the cam uses
+    public static double turnRad, speedMultiplier; // Variables for turning radius and overall speed multiplier
     public static double leftRate, rightRate;
 	
     public static boolean stillPressed;
@@ -127,9 +123,7 @@ public class Robot extends IterativeRobot
     public static boolean elevatorMin;
     public static boolean elevatorManual;	//Boolean to decide whether manual elevator control is allowed
     public static boolean camSetPoint = false;
-    public static boolean gotoSpot, gotoSpot2, gotoSpot3, gotoSpot4;
-    public static boolean gotoCam1 = true;
-    public static boolean gotoCam2 = false;
+    public static boolean gotoCam = true;
     public static boolean camChange = false;
     public static boolean camActivate = false;
     public static boolean goOnce, teleOpOnce; // Variables to allow auto and certain teleop funtions to run only once
@@ -280,17 +274,11 @@ public class Robot extends IterativeRobot
 			sensorThread.schedule(new TimerTask(){public void run(){getSensors();}}, 20, 20);
 			
 			camPID.enable();
-			camPID.setSetpoint(2.5);
-			
-			camPID.setSetpoint(2.91);
 			
 			FLpid.enable();
 			FRpid.enable();
 			BLpid.enable();
 			BRpid.enable();
-			setDrivePID(1000);
-			
-			
 		
 			teleOpOnce = false; // Ending if statement so it only runs once
 		}
@@ -306,8 +294,6 @@ public class Robot extends IterativeRobot
     	manual();
     	
     	buttonToggles();
-    	
-    	camFullManual();
     	
     	camSetpoint();
     	
@@ -370,10 +356,7 @@ public class Robot extends IterativeRobot
     	
     	if (miranda.getRawButton(4) && (stillPressed == false))
     	{
-    		gotoSpot = true;
-    		gotoCam1 = true;
-			gotoCam2 = false;
-    		camActivate = true;
+    		gotoCam = true;
     		stillPressed = true;
     
     		leftArm.set(DoubleSolenoid.Value.kForward);
@@ -383,11 +366,6 @@ public class Robot extends IterativeRobot
     	}
     }
     
-    public void camFullManual()
-    {
-    	//If cam manual is allowed, use the select button to move it in only one direction
-    	Cam.Manual();
-    }
     
     public void buttonToggles(){
     	if(cole.getRawButton(3) == true){
@@ -404,7 +382,7 @@ public class Robot extends IterativeRobot
     		Toggles.stillPressed1 = false;
     	}
     	
-    	if(miranda.getRawButton(6)){
+    	if(miranda.getRawButton(6) == true){
     		Toggles.CamModeToggle();
     	}
     	else{
@@ -439,13 +417,13 @@ public class Robot extends IterativeRobot
     	
     	if ((camActivate) && (camMode == 1))
     	{
-    		Cam.Auto(gotoCam1);
+    		Cam.Auto(gotoCam);
     	}	
     }
     
     public void arcadeDrive()
     {
-    	if(cole.getRawAxis(1)!= cole.getRawAxis(4)){
+    	if(cole.getRawAxis(1)!= 0 && cole.getRawAxis(4) == 0){
     		Drive.drive();
     	}
     }
@@ -454,12 +432,15 @@ public class Robot extends IterativeRobot
     	if(elevatorMax && elevatorMin){
     		Elevator.manual();
     	}
+    	if(camMode == 2){
+    		Cam.Manual();
+    	}
     }
     
     public void armMotors()
     {
-    	if(miranda.getRawAxis(1)!= miranda.getRawAxis(4)){
-    		Drive.drive();
+    	if(miranda.getRawAxis(1)!= 0 && miranda.getRawAxis(4) == 0){
+    		Arms.armMoters();
     	}
     }
        
@@ -612,18 +593,14 @@ public class Robot extends IterativeRobot
     
     public void elevatorUp()
     {
-    	gotoSpot = true;
-		gotoCam1 = true;
-		gotoCam2 = false;
+		gotoCam = true;
 		camActivate = true;
 	
     }
     
     public void elevatorDown()
     {
-    	gotoSpot2 = true;
-		gotoCam1 = false;
-		gotoCam2 = true;
+		gotoCam = false;
 		camActivate = true;
     }
     

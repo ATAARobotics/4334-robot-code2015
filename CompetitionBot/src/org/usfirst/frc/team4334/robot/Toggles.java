@@ -45,14 +45,14 @@ public class Toggles {
     	
     	if (Robot.miranda.getRawButton(1) && (stillPressed1 == false))
     	{
-    		if (Robot.gotoCam1)
+    		if (Robot.gotoCam)
 			{
-				Robot.gotoCam1 = false;
+				Robot.gotoCam = false;
 				
 			}
-    		else if (!Robot.gotoCam1)
+    		else if (!Robot.gotoCam)
     		{
-    			Robot.gotoCam1 = true;
+    			Robot.gotoCam = true;
     		}
     		
     		Robot.camActivate = true;

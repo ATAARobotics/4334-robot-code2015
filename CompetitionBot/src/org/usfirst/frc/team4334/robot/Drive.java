@@ -51,66 +51,66 @@ public class Drive {
 		
 		if(LeftThumb == 0)
     	{
-    		canFL.set(((-(RightThumb * TurnRad))) * SpeedMultiplier);
-    		canBL.set(((-(RightThumb * TurnRad))) * SpeedMultiplier);
+    		canFL.set(((-(Robot.cole.getRawAxis(4) * TurnRad))) * SpeedMultiplier);
+    		canBL.set(((-(Robot.cole.getRawAxis(4) * TurnRad))) * SpeedMultiplier);
     		
-    		canBR.set(((-(RightThumb * TurnRad))) * SpeedMultiplier);
-    		canFR.set(((-(RightThumb * TurnRad))) * SpeedMultiplier);
+    		canBR.set(((-(Robot.cole.getRawAxis(4) * TurnRad))) * SpeedMultiplier);
+    		canFR.set(((-(Robot.cole.getRawAxis(4) * TurnRad))) * SpeedMultiplier);
     	}
     	
     	//If right thumbstick is still
     	
     	if(RightThumb == 0)
     	{
-    		canFL.set(((-LeftThumb)) * SpeedMultiplier);
-    		canBL.set(((-LeftThumb)) * SpeedMultiplier);
+    		canFL.set(((-Robot.cole.getRawAxis(1))) * SpeedMultiplier);
+    		canBL.set(((-Robot.cole.getRawAxis(1))) * SpeedMultiplier);
     		
-    		canBR.set(((LeftThumb)) * SpeedMultiplier);
-    		canFR.set(((LeftThumb)) * SpeedMultiplier);
+    		canBR.set(((Robot.cole.getRawAxis(1))) * SpeedMultiplier);
+    		canFR.set(((Robot.cole.getRawAxis(1))) * SpeedMultiplier);
     	}
     	
     	//If both thumbsticks are positive
     	
     	if(LeftThumb == 1 && RightThumb == 1)
     	{
-    		canFL.set(((-LeftThumb)) * SpeedMultiplier);
-    		canBL.set(((-LeftThumb)) * SpeedMultiplier);
+    		canFL.set(((-Robot.cole.getRawAxis(1))) * SpeedMultiplier);
+    		canBL.set(((-Robot.cole.getRawAxis(1))) * SpeedMultiplier);
     		
-    		canBR.set(((LeftThumb - (RightThumb * TurnRad))) * SpeedMultiplier);
-    		canFR.set(((LeftThumb - (RightThumb * TurnRad))) * SpeedMultiplier);
+    		canBR.set(((Robot.cole.getRawAxis(1) - (Robot.cole.getRawAxis(4) * TurnRad))) * SpeedMultiplier);
+    		canFR.set(((Robot.cole.getRawAxis(1) - (Robot.cole.getRawAxis(4) * TurnRad))) * SpeedMultiplier);
     	}
     	
     	//If left thumbstick is positive and right thumbstick is negative
     	
     	if(LeftThumb == 1 && RightThumb == -1)
     	{
-    		canFL.set(((-(LeftThumb + (RightThumb * TurnRad)))) * SpeedMultiplier);
-    		canBL.set(((-(LeftThumb + (RightThumb * TurnRad)))) * SpeedMultiplier);
+    		canFL.set(((-(Robot.cole.getRawAxis(1) + (Robot.cole.getRawAxis(4) * TurnRad)))) * SpeedMultiplier);
+    		canBL.set(((-(Robot.cole.getRawAxis(1) + (Robot.cole.getRawAxis(4) * TurnRad)))) * SpeedMultiplier);
 		
-    		canBR.set(((LeftThumb)) * SpeedMultiplier);
-    		canFR.set(((LeftThumb)) * SpeedMultiplier);
+    		canBR.set(((Robot.cole.getRawAxis(1))) * SpeedMultiplier);
+    		canFR.set(((Robot.cole.getRawAxis(1))) * SpeedMultiplier);
     	}
     	
     	//If left thumbstick is negative and right thumbstick is positive
     	
     	if(LeftThumb == -1 && RightThumb == 1)
     	{
-    		canFL.set(((-(LeftThumb + (RightThumb * TurnRad)))) * SpeedMultiplier);
-    		canBL.set(((-(LeftThumb + (RightThumb * TurnRad)))) * SpeedMultiplier);
+    		canFL.set(((-(Robot.cole.getRawAxis(1) + (Robot.cole.getRawAxis(4) * TurnRad)))) * SpeedMultiplier);
+    		canBL.set(((-(Robot.cole.getRawAxis(1) + (Robot.cole.getRawAxis(4) * TurnRad)))) * SpeedMultiplier);
     		
-    		canBR.set(((LeftThumb)) * SpeedMultiplier);
-    		canFR.set(((LeftThumb)) * SpeedMultiplier);
+    		canBR.set(((Robot.cole.getRawAxis(1))) * SpeedMultiplier);
+    		canFR.set(((Robot.cole.getRawAxis(1))) * SpeedMultiplier);
     	}
     	
     	//If left thumbstick is negative and right thumbstick is negative
     	
     	if(LeftThumb == -1 && RightThumb == -1)
     	{
-    		canFL.set(((-LeftThumb)) * SpeedMultiplier);
-    		canBL.set(((-LeftThumb)) * SpeedMultiplier);
+    		canFL.set(((-Robot.cole.getRawAxis(1))) * SpeedMultiplier);
+    		canBL.set(((-Robot.cole.getRawAxis(1))) * SpeedMultiplier);
     		
-    		canBR.set(((LeftThumb - (RightThumb * TurnRad))) * SpeedMultiplier);
-    		canFR.set(((LeftThumb - (RightThumb * TurnRad))) * SpeedMultiplier);
+    		canBR.set(((Robot.cole.getRawAxis(1) - (Robot.cole.getRawAxis(4) * TurnRad))) * SpeedMultiplier);
+    		canFR.set(((Robot.cole.getRawAxis(1) - (Robot.cole.getRawAxis(4) * TurnRad))) * SpeedMultiplier);
     	}
     	else{
     		System.out.println("There was a problem (sent from Drive.class)");

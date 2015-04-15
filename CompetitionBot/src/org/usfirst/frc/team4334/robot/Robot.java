@@ -210,7 +210,7 @@ public class Robot extends IterativeRobot
     	goOnce = true;
         	
     	camPID = new PIDController(-8, 0, -1, pot1, talKicker);
- 
+    	
     	camSet1 = prefs.getDouble("Cam_In", 2.5);
     	camSet2 = prefs.getDouble("Cam_Out", 2.91);
     	deadZ = prefs.getDouble("DeadZone", 0.1);
@@ -351,7 +351,7 @@ public class Robot extends IterativeRobot
 
     	getJoy();
     	
-    	Drivetrain.getArcade(canFR, canFL, canBR, canBL, rightThumb, leftThumb, speedMultiplier, turnRad);
+    	Drivetrain.getArcadeV2(canFR, canFL, canBR, canBL, rightThumb, leftThumb, speedMultiplier, turnRad);
     
     	armMotors();
     	
@@ -441,16 +441,16 @@ public class Robot extends IterativeRobot
     		leftArm.set(DoubleSolenoid.Value.kForward);
 			rightArm.set(DoubleSolenoid.Value.kForward);
     		
-    		if ((elevatorMin) && (elevatorR >= 1400))
+    		if ((elevatorMin) && (elevatorR >= 1200))
     		{
-    			canWinch.set(0.6);
-    			canWinch2.set(0.6);
+    			canWinch.set(0.8);
+    			canWinch2.set(0.8);
     		}
     		
     		else if((elevatorMin) && (elevatorR < 1400))
     		{
-    			canWinch.set(0.2);
-    			canWinch2.set(0.2);
+    			canWinch.set(0.4);
+    			canWinch2.set(0.4);
     		}
     		
     		else 
@@ -514,7 +514,7 @@ public class Robot extends IterativeRobot
     		leftArm.set(DoubleSolenoid.Value.kForward);
 			rightArm.set(DoubleSolenoid.Value.kForward);
     		
-    		if ((elevatorR < 10768) && (elevatorMax))
+    		if ((elevatorR < 10160) && (elevatorMax))
     		{
     			canWinch.set(-1);
     			canWinch2.set(-1);
@@ -674,7 +674,7 @@ public class Robot extends IterativeRobot
     		
     		if (joy.getRawButton(1) && (stillPressed3 == false))
     		{
-    			
+    			Solenoid.toggle(flipper);
     			stillPressed3 = true;
     		}	
     }

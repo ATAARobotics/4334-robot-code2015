@@ -72,4 +72,29 @@ public class Drivetrain
     		FR.set(((leftThumb)) * speedMultiplier);
 		}
 	}
+	
+	public static void getArcadeV2(SpeedController FR, SpeedController FL, SpeedController BR, SpeedController BL, 
+			double rightThumb, double leftThumb, double speedMultiplier, double turnRad)
+	{
+		
+		if(leftThumb != 0)
+		{
+				FL.set(-((leftThumb + (0.5 * (rightThumb * turnRad)) * speedMultiplier)));
+	    		BL.set(-((leftThumb + (0.5 * (rightThumb * turnRad)) * speedMultiplier)));
+	    		
+	    		BR.set((leftThumb - (0.5 * (rightThumb * turnRad)) * speedMultiplier));
+	    		FR.set((leftThumb - (0.5 * (rightThumb * turnRad)) * speedMultiplier));
+		}
+		
+		else
+		{
+			FL.set(-(rightThumb * speedMultiplier));
+	   		BL.set(-(rightThumb * speedMultiplier));
+	    		
+	    	BR.set(-(rightThumb * speedMultiplier));
+	   		FR.set(-(rightThumb * speedMultiplier));
+		
+		}
+	}
+	
 }

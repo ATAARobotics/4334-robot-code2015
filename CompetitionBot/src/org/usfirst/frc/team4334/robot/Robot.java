@@ -99,6 +99,10 @@ public class Robot extends IterativeRobot
 	Timer camThread;
 	
 	PIDController camPID;
+	PIDController FL;
+	PIDController BL;
+	PIDController FR;
+	PIDController BR;
 
 	AnalogInput pot1;		//Potentiometer, Compressor and solenoids
 	Compressor comp;
@@ -210,6 +214,10 @@ public class Robot extends IterativeRobot
     	goOnce = true;
         	
     	camPID = new PIDController(-8, 0, -1, pot1, talKicker);
+    	FR = new PIDController(-1, 0, -1, encoderR, canFR);
+    	FL = new PIDController(-1, 0, -1, encoderR, canFL);
+    	BR = new PIDController(1, 0, -1, encoderR, canBR);
+    	BL = new PIDController(1, 0, -1, encoderR, canBL);
     	
     	camSet1 = prefs.getDouble("Cam_In", 2.5);
     	camSet2 = prefs.getDouble("Cam_Out", 2.91);
@@ -220,52 +228,7 @@ public class Robot extends IterativeRobot
     
     public void autonomousInit()
     {
-    	elevatorThread2Auto.schedule(new TimerTask(){public void run(){elevatorLow();}}, 20, 20); //Starting Threads for auto
-		elevatorThreadAuto.schedule(new TimerTask(){public void run(){elevatorOneTote();}}, 20, 20);
-		sensorThread.schedule(new TimerTask(){public void run(){getSensors();}}, 20, 20);
-		camThreadAuto.schedule(new TimerTask(){public void run(){camSetpoint();}}, 20, 20);
-		
-		if(autoMode == 0)
-		{
-			goOnce = false;
-			nothingAuto();
-		}
-		
-		if(autoMode == 1)
-		{
-			goOnce = false;
-			moveToZoneAuto();
-		}
-		
-		if(autoMode == 2)
-		{
-			goOnce = false;
-			oneToteAuto();
-		}
-		
-		if(autoMode == 3)
-		{
-			goOnce = false;
-			oneBinAuto();
-		}
-		
-		if(autoMode == 4)
-		{
-			goOnce = false;
-			Testing();
-		}
-		
-		if(autoMode == 6)
-		{
-			goOnce = false;
-			binJackerAuto();     
-		}
-		
-		if(autoMode == 7)
-		{
-			goOnce = false;
-			threeToteAuto();
-		}
+    	
     }
     
     /**
@@ -274,9 +237,8 @@ public class Robot extends IterativeRobot
     
     public void autonomousPeriodic()
     {
-    	/*
-    	 * if(goOnce) // Allows Auto to run only once instead of 20x per second
-    	{
+    	  if(goOnce) // Allows Auto to run only once instead of 20x per second
+    	  {
        		elevatorThread2Auto.schedule(new TimerTask(){public void run(){elevatorLow();}}, 20, 20); //Starting Threads for auto
     		elevatorThreadAuto.schedule(new TimerTask(){public void run(){elevatorOneTote();}}, 20, 20);
     		sensorThread.schedule(new TimerTask(){public void run(){getSensors();}}, 20, 20);
@@ -324,7 +286,7 @@ public class Robot extends IterativeRobot
     			threeToteAuto();
     		}
     	}
-    	*/
+  
     }
 
     
@@ -341,6 +303,10 @@ public class Robot extends IterativeRobot
 			
 			//camPID.enable();
 			camPID.setSetpoint(2.5);
+			FR.enable();
+			FL.enable();
+			BR.enable();
+			BL.enable();
 		
 			teleOpOnce = false; // Ending if statement so it only runs once
 		}
@@ -848,6 +814,14 @@ public class Robot extends IterativeRobot
    
     //Auto Mode methods
     
+    public void setPID(int distance)
+    {
+    	FR.setSetpoint(distance);
+    	FL.setSetpoint(distance);
+    	BR.setSetpoint(distance);
+    	BL.setSetpoint(distance);
+    }
+    
     public void getSensors()
     {
     	//Gets the absolute value of the drivetrain encoders
@@ -1038,7 +1012,7 @@ public class Robot extends IterativeRobot
     
     public void Testing()
     {
-    	
+    	setPID(1000);
     }
     
     public void moveToZoneAuto()

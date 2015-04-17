@@ -36,6 +36,8 @@
 
 package org.usfirst.frc.team4334.robot;
 
+import external.*;
+
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -71,6 +73,8 @@ public class Robot extends IterativeRobot
    
 	public Joystick joy;	//Xbox controllers
 	public Joystick joy2;
+	
+	SuperController cole;
 	
 	CameraServer camera;
 	
@@ -188,6 +192,8 @@ public class Robot extends IterativeRobot
     
     	joy = new Joystick(0);
     	joy2 = new Joystick(1);
+    	
+    	cole = new SuperController(joy);
     
     	comp  = new Compressor(0);
     	comp.setClosedLoopControl(true); // Setting compressor to closed loop control (basically automatic)
@@ -318,13 +324,9 @@ public class Robot extends IterativeRobot
 
     	getJoy();
     	
-    	//Temporary Arm Motors
-    	armMotors();
-    	
-    	Drivetrain.getArcadeV2(canFR, canFL, canBR, canBL, rightThumb, leftThumb, speedMultiplier, turnRad);
+    	Drivetrain.getArcade(canFR, canFL, canBR, canBL, rightThumb, leftThumb, speedMultiplier, turnRad);
     
-    	//This does not work
-    	//Arms.getArcadeArms(talArmRight, talArmLeft, rightThumb2, leftThumb2, 1, 1);
+    	armMotors();
     	
     	Elevator.manualControl(canWinch, canWinch2, elevatorMax, elevatorMin, leftTrig, rightTrig);
     	
@@ -355,25 +357,9 @@ public class Robot extends IterativeRobot
     
     public void getJoy()
     {
-    	if((-joy.getRawAxis(1) <= deadZ) && (-joy.getRawAxis(1) >= -deadZ))
-    	{
-    		leftThumb = 0;
-    	}
+    	leftThumb = cole.getAxisWithDeadzone(1, deadZ, true);
     	
-    	else
-    	{
-    		leftThumb = -joy.getRawAxis(1);
-    	}
-    	
-    	if((joy.getRawAxis(4) <= deadZ) && (joy.getRawAxis(4) >= -deadZ))
-    	{
-    		rightThumb = 0;
-    	}
-    	
-    	else
-    	{
-    		rightThumb = joy.getRawAxis(4);
-    	}
+    	rightThumb = cole.getAxisWithDeadzone(4, deadZ, false);
     	
 
     	leftTrig = (joy2.getRawAxis(3));
@@ -711,8 +697,8 @@ public class Robot extends IterativeRobot
     	
     	//Assign xbox values to variables
     	
-		leftThumb2 = -(joy2.getRawAxis(1));
-    	rightThumb2 = -(joy2.getRawAxis(4));
+		leftThumb2 = (joy2.getRawAxis(1));
+    	rightThumb2 = (joy2.getRawAxis(4));
     	
     	deadZ2 = 0.17;
     	

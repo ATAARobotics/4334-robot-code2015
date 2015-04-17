@@ -6,30 +6,23 @@ public class Elevator
 {
 	public static void manualControl(SpeedController left, SpeedController right, boolean limitTop, boolean limitBottom, double trigLeft, double trigRight)
 	{
-		if((limitTop) && (limitBottom))
+		if(limitTop)
 		{
 			Robot.elevatorManual = true;
 			Robot.gotoSpot=false;
 			Robot.gotoSpot2 = false;
 			Robot.gotoSpot3 = false;
-			left.set(trigRight - trigLeft);
-			right.set(trigRight - trigLeft);
+			left.set(-trigLeft);
+			right.set(-trigLeft);
 		}
-		else if((limitTop) && (!limitBottom)){
+		else if(limitBottom)
+		{
 			Robot.elevatorManual = true;
 			Robot.gotoSpot=false;
 			Robot.gotoSpot2 = false;
 			Robot.gotoSpot3 = false;
 			left.set(trigRight);
 			right.set(trigRight);
-		}
-		else if ((!limitTop) && (limitBottom)){
-			Robot.elevatorManual = true;
-			Robot.gotoSpot=false;
-			Robot.gotoSpot2 = false;
-			Robot.gotoSpot3 = false;
-			left.set(-(trigLeft));
-			right.set(-(trigLeft));
 		}
 		else
 		{

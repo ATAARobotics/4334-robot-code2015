@@ -97,6 +97,23 @@ public class Drivetrain
 		}
 	}
 	
-	
+	public static void getArcadeArms(SpeedController right, SpeedController left, double rightThumb, double leftThumb, double speedMultiplier, double turnRad)
+	{
+		
+		if(leftThumb != 0)
+		{
+			left.set(-((leftThumb + (0.5 * (rightThumb * turnRad)) * speedMultiplier)));
+	    		
+	    	right.set((leftThumb - (0.5 * (rightThumb * turnRad)) * speedMultiplier));
+		}
+		
+		else
+		{
+			left.set(-(rightThumb * speedMultiplier));
+	    		
+	    	right.set(-(rightThumb * speedMultiplier));
+		
+		}
+	}
 	
 }

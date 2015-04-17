@@ -15,6 +15,22 @@ public class Elevator
 			left.set(trigRight - trigLeft);
 			right.set(trigRight - trigLeft);
 		}
+		else if((limitTop) && (!limitBottom)){
+			Robot.elevatorManual = true;
+			Robot.gotoSpot=false;
+			Robot.gotoSpot2 = false;
+			Robot.gotoSpot3 = false;
+			left.set(trigRight);
+			right.set(trigRight);
+		}
+		else if ((!limitTop) && (limitBottom)){
+			Robot.elevatorManual = true;
+			Robot.gotoSpot=false;
+			Robot.gotoSpot2 = false;
+			Robot.gotoSpot3 = false;
+			left.set(-(trigLeft));
+			right.set(-(trigLeft));
+		}
 		else
 		{
 			left.set(0);

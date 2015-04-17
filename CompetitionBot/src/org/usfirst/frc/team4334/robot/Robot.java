@@ -318,9 +318,13 @@ public class Robot extends IterativeRobot
 
     	getJoy();
     	
+    	//Temporary Arm Motors
+    	armMotors();
+    	
     	Drivetrain.getArcadeV2(canFR, canFL, canBR, canBL, rightThumb, leftThumb, speedMultiplier, turnRad);
     
-    	Drivetrain.getArcadeArms(talArmRight, talArmLeft, rightThumb2, leftThumb2, 1, 1);
+    	//This does not work
+    	//Arms.getArcadeArms(talArmRight, talArmLeft, rightThumb2, leftThumb2, 1, 1);
     	
     	Elevator.manualControl(canWinch, canWinch2, elevatorMax, elevatorMin, leftTrig, rightTrig);
     	
@@ -707,8 +711,8 @@ public class Robot extends IterativeRobot
     	
     	//Assign xbox values to variables
     	
-		leftThumb2 = (joy2.getRawAxis(1));
-    	rightThumb2 = (joy2.getRawAxis(4));
+		leftThumb2 = -(joy2.getRawAxis(1));
+    	rightThumb2 = -(joy2.getRawAxis(4));
     	
     	deadZ2 = 0.17;
     	

@@ -139,9 +139,13 @@ public class Robot extends IterativeRobot
     boolean camChanger = true;
     boolean elevatorMax;	//Booleans for elevator limit switches
     boolean elevatorMin;
-    boolean elevatorManual;	//Boolean to decide whether manual elevator control is allowed
+    static boolean elevatorManual;	//Boolean to decide whether manual elevator control is allowed
     boolean camSetPoint = false;
-	boolean gotoSpot, gotoSpot2, gotoSpot3, gotoSpot4;
+	static boolean gotoSpot;
+	static boolean gotoSpot2;
+	static boolean gotoSpot3;
+
+	boolean gotoSpot4;
 	boolean gotoCam1 = true;
 	boolean gotoCam2 = false;
 	boolean camChange = false;
@@ -214,10 +218,10 @@ public class Robot extends IterativeRobot
     	goOnce = true;
         	
     	camPID = new PIDController(-8, 0, -1, pot1, talKicker);
-    	FR = new PIDController(-1, 0, -1, encoderR, canFR);
+    	FR = new PIDController(1, 0, 1, encoderR, canFR);
     	FL = new PIDController(-1, 0, -1, encoderR, canFL);
-    	BR = new PIDController(1, 0, -1, encoderR, canBR);
-    	BL = new PIDController(1, 0, -1, encoderR, canBL);
+    	BR = new PIDController(1, 0, 1, encoderR, canBR);
+    	BL = new PIDController(-1, 0, -1, encoderR, canBL);
     	
     	camSet1 = prefs.getDouble("Cam_In", 2.5);
     	camSet2 = prefs.getDouble("Cam_Out", 2.91);
@@ -303,10 +307,7 @@ public class Robot extends IterativeRobot
 			
 			//camPID.enable();
 			camPID.setSetpoint(2.5);
-			FR.enable();
-			FL.enable();
-			BR.enable();
-			BL.enable();
+			
 		
 			teleOpOnce = false; // Ending if statement so it only runs once
 		}
@@ -319,9 +320,11 @@ public class Robot extends IterativeRobot
     	
     	Drivetrain.getArcadeV2(canFR, canFL, canBR, canBL, rightThumb, leftThumb, speedMultiplier, turnRad);
     
-    	armMotors();
+    	Drivetrain.getArcadeArms(talArmRight, talArmLeft, rightThumb2, leftThumb2, 1, 1);
     	
-    	elevator();
+    	Elevator.manualControl(canWinch, canWinch2, elevatorMax, elevatorMin, leftTrig, rightTrig);
+    	
+    	//elevator();
     	
     	buttonToggles();
     	
@@ -367,6 +370,14 @@ public class Robot extends IterativeRobot
     	{
     		rightThumb = joy.getRawAxis(4);
     	}
+    	
+
+    	leftTrig = (joy2.getRawAxis(3));
+    	rightTrig = (joy2.getRawAxis(2));
+    	leftTrig2 = (joy.getRawAxis(2) * 2);
+    	rightTrig2 = (joy.getRawAxis(3) * 2);
+    	
+    	
     }
     
     public void smartDashboard()
@@ -514,8 +525,14 @@ public class Robot extends IterativeRobot
     }
     
     public void buttonToggles()
-    
     {
+    	if(joy.getRawButton(7) == true)
+    	{
+    		encoderElevator.reset();
+    		encoderR.reset();
+    		encoderL.reset();
+    	}
+    	
     	//Arcade mode speed switcher
     	
     	if (joy.getRawButton(3) == false) {stillPressed10 = false;}
@@ -749,66 +766,7 @@ public class Robot extends IterativeRobot
     		talArmRight.set(-(leftThumb2 - (rightThumb2 * 0.9))); 	
     	}
     }
-       
-    public void elevator()
-    	
-    {
-    	
-    	//Elevator Motors [Y = Up B = Down]
-    	
-     		if((joy2.getRawAxis(3) > 0) && (joy2.getRawAxis(2) > 0))
-        	{
-        		canWinch.set(0);
-        		canWinch2.set(0);
-        	}
-     		
-     		if((joy2.getRawAxis(3) < 0.01) && (joy2.getRawAxis(2) < 0.01))
-        	{
-        		canWinch.set(0);
-        		canWinch2.set(0);
-        	}
-     		
-        	if((joy2.getRawAxis(3) > 0) && (joy2.getRawAxis(2) < 0.01) && (elevatorMax))
-        	{
-        		elevatorManual = true;
-        		gotoSpot=false;
-        		gotoSpot2 = false;
-        		gotoSpot3 = false;
-        		canWinch.set(-(joy2.getRawAxis(3)));
-        		canWinch2.set(-(joy2.getRawAxis(3)));
-        	}
-        	
-        	if((joy2.getRawAxis(3) > 0) && (joy2.getRawAxis(2) < 0.01) && (!elevatorMax))
-        	{
-        		canWinch.set(0);
-        		canWinch2.set(0);
-        	}
-        	
-        	if((joy2.getRawAxis(3) < 0.001) && (joy2.getRawAxis(2) > 0) && (elevatorMin))
-        	{
-        		elevatorManual = true;
-        		gotoSpot=false;
-        		gotoSpot2 = false;
-        		gotoSpot3 = false;
-        		canWinch.set(joy2.getRawAxis(2));
-        		canWinch2.set(joy2.getRawAxis(2));
-        	}
-        	
-        	if((joy2.getRawAxis(3) < 0.001) && (joy2.getRawAxis(2) > 0) && (!elevatorMin))
-        	{
-        		canWinch.set(0);
-        		canWinch2.set(0);
-        	}
-        	
-        //Use button on the first controller to reset the elevator encoder, useful for not fucking up the threaded rod :P
-        	
-    	if(joy.getRawButton(7) == true)
-    	{
-    		encoderElevator.reset();
-    		encoderR.reset();
-    		encoderL.reset();
-    	}
-    }
+
 
 //----------------------------------------------------------------------------------------------------------------------------------\\
    
@@ -830,9 +788,6 @@ public class Robot extends IterativeRobot
     	rightR = Math.abs(encoderR.get());
     	rightRate = encoderR.getRate();
     	leftRate = encoderL.getRate();
-    	
-    	leftTrig2 = (joy.getRawAxis(2) * 2);
-    	rightTrig2 = (joy.getRawAxis(3) * 2);
     	
     	//Gets the regular values of everything else
     	
@@ -1012,6 +967,10 @@ public class Robot extends IterativeRobot
     
     public void Testing()
     {
+    	FR.enable();
+		FL.enable();
+		BR.enable();
+		BL.enable();
     	setPID(1000);
     }
     

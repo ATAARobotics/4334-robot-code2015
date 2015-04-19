@@ -72,7 +72,7 @@ public class Robot extends IterativeRobot
     Preferences prefs;
    
 	public Joystick joy;	//Xbox controllers
-	public Joystick joy2;
+	public static Joystick joy2;
 	
 	SuperController cole;
 	
@@ -85,8 +85,8 @@ public class Robot extends IterativeRobot
     CANTalon canWinch;
     CANTalon canWinch2;
     Talon talKicker;	//Talon SRs
-    Talon talArmLeft;
-    Talon talArmRight;
+    static Talon talArmLeft;
+    static Talon talArmRight;
     
     Encoder encoderL; //Encoders
 	Encoder encoderR;
@@ -120,13 +120,17 @@ public class Robot extends IterativeRobot
     
     String gearPos, gearPos2; // Strings for the smartdasboard gear positions
     
-    double leftThumb2,rightThumb2; 	// Variables where second Xbox thumbstick values are stored
+    static double leftThumb2; 	// Variables where second Xbox thumbstick values are stored
+
+	static double rightThumb2;
     double leftTrig,rightTrig;	   	// Variables where Xbox trigger values are stored
     double leftTrig2,rightTrig2;	// Variables where second Xbox trigger values are stored
     double degrees, potDegrees;		// Variables where Potentiometer values are stored
 	double leftThumb,rightThumb;	// Variables where first Xbox thumbstick values are stored
 	double turnRad, speedMultiplier;// Variables for turning radius and overall speed multiplier
-	double deadZ, deadZ2;			// Variables that store deadzones
+	double deadZ;			// Variables that store deadzones
+
+	static double deadZ2;
 	double camSet1, camSet2;		// Variables that decide that setpoints the cam uses
 	double leftRate, rightRate;
 	
@@ -159,6 +163,9 @@ public class Robot extends IterativeRobot
 	int camMode;	// Decide whether cam should use setpoint or manual mode
 	int leftR, rightR, elevatorR;	// Variables that store encoder values. "R" means rotations not "right".
 	int autoMode;	// Variable that decides which auto to use
+	
+	Auto auto;
+	Arms Arms;
 	
     public void robotInit()
     {
@@ -233,6 +240,8 @@ public class Robot extends IterativeRobot
     	camSet2 = prefs.getDouble("Cam_Out", 2.91);
     	deadZ = prefs.getDouble("DeadZone", 0.1);
     	autoMode = prefs.getInt("Auto_Mode", 0); // Determining which auto mode should be used from the preferences table on SmartDashboard
+    	Arms = new Arms(leftArm, rightArm);
+    	auto = new Auto(encoderL, encoderR, canFL, canBL, canFR, canBR, talArmLeft, talArmRight);
     }
 
     
@@ -628,7 +637,7 @@ public class Robot extends IterativeRobot
     	
     	if (joy.getRawButton(5) && (stillPressed2 == false))
     	{
-    		Arms.toggle(leftArm, rightArm);
+    		Arms.toggle();
     		stillPressed2 = true;
     	}
     	
@@ -637,7 +646,7 @@ public class Robot extends IterativeRobot
 		
     	if (joy2.getRawButton(5) && (stillPressed4 == false))
     	{
-    		Arms.toggle(leftArm, rightArm);
+    		Arms.toggle();
     		stillPressed4 = true;
     	}
     	
@@ -793,7 +802,7 @@ public class Robot extends IterativeRobot
     	SmartDashboard.putNumber("Elevator Encoder", elevatorR);
     }
     
-    public void drive(int distance, double power)
+    /*public void drive(int distance, double power)
     {
     	encoderR.reset();
 		encoderL.reset();
@@ -913,7 +922,7 @@ public class Robot extends IterativeRobot
 		encoderR.reset();
 		encoderL.reset();
     	
-    }
+    }*/
   
     public void wait(int Milliseconds)
     {
@@ -966,7 +975,7 @@ public class Robot extends IterativeRobot
     
     public void moveToZoneAuto()
     {
-    	drive(750, -0.5);
+    	auto.drive(750, -0.5);
     	
     	elevatorThreadAuto.cancel();
     	elevatorThread2Auto.cancel();
@@ -975,13 +984,13 @@ public class Robot extends IterativeRobot
     
     public void oneToteAuto()
     {
-    	Arms.close(leftArm, rightArm);
+    	Arms.close();
     	
-    	setTurn(48.5, -1);
+    	auto.setTurn(48.5, -1);
     	
-    	drive(1100, 0.5);
+    	auto.drive(1100, 0.5);
     	
-    	Arms.open(leftArm, rightArm);
+    	Arms.open();
     	
     	elevatorThreadAuto.cancel();
     	elevatorThread2Auto.cancel();
@@ -990,13 +999,13 @@ public class Robot extends IterativeRobot
     
     public void oneBinAuto()
     {
-    	Arms.close(leftArm, rightArm);
+    	Arms.close();
     	
-    	setTurn(90, 1);
+    	auto.setTurn(90, 1);
     	
-    	drive(1400, 0.5);
+    	auto.drive(1400, 0.5);
     	
-    	Arms.open(leftArm, rightArm);
+    	Arms.open();
     	
     	elevatorThreadAuto.cancel();
     	elevatorThread2Auto.cancel();
@@ -1015,24 +1024,24 @@ public class Robot extends IterativeRobot
     		//Start
     	encoderR.reset();
     	elevatorUp();	    	
-    	Arms.open(leftArm, rightArm);
+    	Arms.open();
     	wait(1100);
     		//Turn 1
-  		setTurn(31, -0.5);
+  		auto.setTurn(31, -0.5);
   		wait(10);
     		//Drive 1 w/ anti-coast
-  		drive(800, 0.65);
+  		auto.drive(800, 0.65);
   		wait(10);
-    	drive(80, -0.65);
+    	auto.drive(80, -0.65);
     	wait(10);
     		//Turn 2
-  	    setTurn(35.955, 0.5);
+  	    auto.setTurn(35.955, 0.5);
     	wait(10);
     		//Drive 2 w/ arms and FUCKING INTAKE BITCH
-    	moveArmswhileDrive (1200, 0.40, -1);
-   	   	moveArms(500, -1);
-     	Arms.close(leftArm, rightArm);
-      	moveArms(1000, -1);
+    	auto.moveArmswhileDrive (1200, 0.40, -1);
+   	   	auto.moveArms(500, -1);
+     	Arms.close();
+      	auto.moveArms(1000, -1);
 	    wait(10);
 	    	//Tote 2 gets picked up	 
 	    camIn();
@@ -1042,28 +1051,28 @@ public class Robot extends IterativeRobot
 	    elevatorUp();
 	    wait(1100);
     		//Turn 3
-	    setTurn(40, -0.65);
+	    auto.setTurn(40, -0.65);
   	   	wait(10);
     		//Drive 3 w/ anti-coast
-   		drive(800, 0.65);
+  	    auto.drive(800, 0.65);
        	wait(10);
-   		drive(80, -0.65);
+       	auto.drive(80, -0.65);
      	wait(10);
     		//Turn 4
-    	setTurn(30, 0.65);
+     	auto.setTurn(30, 0.65);
     	wait(10);
     		//Drive 4 w/ arms and intake
-    	moveArmswhileDrive (1200, 0.40, -1);
-    	moveArms(500, -1);
-       	Arms.close(leftArm, rightArm);
-       	moveArms(1000, -1);
+    	auto.moveArmswhileDrive (1200, 0.40, -1);
+    	auto.moveArms(500, -1);
+       	Arms.close();
+       	auto.moveArms(1000, -1);
         wait(10);
     		//End
     }
 
     public void binJackerAuto()
     {
-    	drive(598, -0.7);
+    	auto.drive(598, -0.7);
 		
 		wait(900);
 		
@@ -1071,7 +1080,7 @@ public class Robot extends IterativeRobot
     	
     	wait(1000);
     	
-    	drive(800, 1);
+    	auto.drive(800, 1);
     	
 		wait(700);
 		

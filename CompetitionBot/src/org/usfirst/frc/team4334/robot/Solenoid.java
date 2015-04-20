@@ -2,8 +2,6 @@ package org.usfirst.frc.team4334.robot;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 
-//AUTHOR: Jayden Chan
-
 public class Solenoid 
 {
 	public static void toggle(DoubleSolenoid piston)

@@ -2,8 +2,6 @@ package org.usfirst.frc.team4334.robot;
 
 import edu.wpi.first.wpilibj.SpeedController;
 
-//AUTHOR: Jayden Chan
-
 public class Drivetrain 
 {
 	public static void getArcade(SpeedController FR, SpeedController FL, SpeedController BR, SpeedController BL, 
@@ -73,7 +71,7 @@ public class Drivetrain
 		}
 	}
 	
-	public static void getArcadeV2(SpeedController FR, SpeedController FL, SpeedController BR, SpeedController BL, 
+	/*public static void getArcadeV2(SpeedController FR, SpeedController FL, SpeedController BR, SpeedController BL, 
 			double rightThumb, double leftThumb, double speedMultiplier, double turnRad)
 	{
 		
@@ -115,5 +113,5 @@ public class Drivetrain
 		
 		}
 	}
-	
+	*/
 }

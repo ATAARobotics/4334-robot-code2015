@@ -239,7 +239,7 @@ public class Robot extends IterativeRobot
     	camSet1 = prefs.getDouble("Cam_In", 2.5);
     	camSet2 = prefs.getDouble("Cam_Out", 2.91);
     	deadZ = prefs.getDouble("DeadZone", 0.1);
-    	autoMode = prefs.getInt("Auto_Mode", 0); // Determining which auto mode should be used from the preferences table on SmartDashboard
+    	autoMode = 6;//prefs.getInt("Auto_Mode", 0); // Determining which auto mode should be used from the preferences table on SmartDashboard
     	Arms = new Arms(leftArm, rightArm);
     	auto = new Auto(encoderL, encoderR, canFL, canBL, canFR, canBR, talArmLeft, talArmRight);
     }
@@ -343,9 +343,9 @@ public class Robot extends IterativeRobot
     	
     	buttonToggles();
     	
-    	camFullManual();
+    	//camFullManual();
     	
-    	camSetpoint();
+    	//camSetpoint();
     	
     	smartDashboard();
     	
@@ -966,11 +966,25 @@ public class Robot extends IterativeRobot
     
     public void Testing()
     {
-    	FR.enable();
-		FL.enable();
-		BR.enable();
-		BL.enable();
-    	setPID(1000);
+    	auto.drive(2000, 1);
+    	wait(1000);
+    	auto.drive(-2000, 1);
+    	wait(1000);
+    	Arms.close();
+    	wait(1000);
+    	Arms.open();
+    	wait(1000);
+    	auto.setTurn(90, 0.666);
+    	wait(1000);
+    	auto.setTurn(90, -0.666);
+    	wait(1000);
+    	auto.moveArms(1000, 1);
+    	wait(1000);
+    	auto.moveArmswhileDrive(2000, 1, 1);
+    	wait(1000);
+ 
+    	
+    	
     }
     
     public void moveToZoneAuto()
@@ -1072,19 +1086,12 @@ public class Robot extends IterativeRobot
 
     public void binJackerAuto()
     {
-    	auto.drive(598, -0.7);
-		
-		wait(900);
-		
+    	
     	Solenoid.toggle(flipper);
     	
-    	wait(1000);
+    	wait(550);
     	
-    	auto.drive(800, 1);
-    	
-		wait(700);
-		
-    	Solenoid.toggle(flipper);
+    	auto.drive(1678, 1);
     	
     	elevatorThreadAuto.cancel();
     	elevatorThread2Auto.cancel();

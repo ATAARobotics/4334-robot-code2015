@@ -837,7 +837,7 @@ public class Robot extends IterativeRobot
     	Solenoid.toggle(flipper);
     	
     	//wait(800);
-    	wait(500);
+    	wait(480);
     	
     	auto.drive(2056, 1);
     	
